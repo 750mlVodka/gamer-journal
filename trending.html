@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    
     <!-- HTML Meta Tags -->
-    <title>Gamer Journal - Home</title>
+    <title>Gamer Journal — Trending</title>
     <meta name="description"
-        content="Search and explore video games from RAWG database. Add video games to your favorites or wishlist.">
+        content="Trending video games from RAWG database. Add video games to your favorites or wishlist.">
     <meta name="author" content="Yamsir Hernandez">
 
     <link rel="stylesheet" href="src/css/normalize.css" />
@@ -35,29 +35,23 @@
         <nav>
             <button id="menuBtn" aria-expanded="false" aria-controls="primaryNav">☰</button>
             <ul id="primaryNav" class="nav-list">
-                <li><a href="index.html" class="active">Home</a></li>
-                <li><a href="trending.html">Trending</a></li>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="trending.html" class="active">Trending</a></li>
                 <li><a href="wishlist.html">Wishlist</a></li>
             </ul>
         </nav>
     </header>
 
-    <main class="container" id="main">
-        <section class="search-section">
-            <h1>Search Games</h1>
-            <form id="searchForm" aria-label="Search games">
-                <label for="q"></label>
-                <input id="q" name="q" type="search" placeholder="Search games by title..." autocomplete="off"
-                    required />
-                <button id="searchBtn" type="submit">Search</button>
-            </form>
+    <main class="container">
+        <section>
+            <h1>Trending Games</h1>
+            <p>Popular titles from the RAWG database.</p>
         </section>
 
-        <section id="results" class="results" aria-live="polite">
-            <!-- Game cards -->
+        <section id="trendingGrid" class="results" aria-live="polite">
+            <!-- trending cards -->
         </section>
 
-        <!-- Modal for game details -->
         <div id="modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
             <div class="modal-content" role="document" tabindex="-1">
                 <button class="modal-close" aria-label="Close details">&times;</button>
@@ -68,7 +62,7 @@
 
     <footer class="site-footer">
         <p>&copy; <span id="year"></span> Gamer Journal — Cuautla, México</p>
-        <p><a href="" target="_blank" rel="">X</a></p>
+        <p><a href="" target="_blank" rel="">V</a></p>
     </footer>
 
 </body>
