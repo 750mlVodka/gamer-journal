@@ -1,10 +1,10 @@
 :root {
-    --bg-dark: #10181F;
-    --bg-card: #1B2E35;
-    --accent: #1DE9B6;
-    --muted: #9DB6B3;
-    --text: #F2F4F7;
-    --border: #e6eef81f;
+    --bg-dark: #202020;
+    --bg-card: #181818;
+    --accent: #42C2FF;
+    --muted: #0088CC;
+    --text: #E0E0E0;
+    --border: #444444;
 }
 
 body {
@@ -59,7 +59,7 @@ body {
 }
 
 .nav-list a {
-    color: var(--muted);
+    color: var(--accent);
     text-decoration: none;
     font-weight: 600;
     padding: 0.35rem 0.5rem;
@@ -68,7 +68,7 @@ body {
 
 .nav-list a.active {
     color: var(--text);
-    background: rgba(15, 98, 254, 0.1)
+    background: var(--accent);
 }
 
 /* container */
@@ -81,7 +81,7 @@ body {
 /* search */
 .search-section h1 {
     margin: 0 0 0.5rem 0;
-    color: var(--accent)
+    color: var(--accent);
 }
 
 #searchForm {
@@ -103,7 +103,7 @@ body {
     border-radius: 8px;
     border: none;
     background: var(--accent);
-    color: #fff;
+    color: var(--text);
     cursor: pointer
 }
 
@@ -173,7 +173,7 @@ body {
 .btn--ghost {
     background: transparent;
     color: var(--accent);
-    border: 1px solid rgba(15, 98, 254, 0.12)
+    border: 1px solid var(--border)
 }
 
 .btn--primary {
@@ -215,7 +215,7 @@ body {
 }
 
 #modalBody h2 {
-    color: var(--accent);
+    color: var(--text);
     margin: 0 0 0.5rem 0;
 }
 
