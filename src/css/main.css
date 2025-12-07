@@ -33,12 +33,13 @@ body {
 }
 
 .logo {
-    width: 36px;
-    height: 36px
+    width: 3rem;
+    height: 3rem
 }
 
 .site-title {
-    font-weight: 700
+    font-weight: bold;
+    font-size: 1.5rem;
 }
 
 /* nav */
@@ -87,9 +88,10 @@ body {
 
 /* search */
 .search-section h1 {
-    margin: 0 0 0.5rem 0;
+    text-align: center;
     color: var(--accent);
 }
+
 
 #searchForm {
     display: flex;
