@@ -19,12 +19,6 @@ Gamer Journal is a web application that allows users to search and explore video
 ## GitHub Page Link
 [Gamer Journal GitHub Page](https://750mlvodka.github.io/gamer-journal/)
 
-## Setup
-
-1. Clone the repository.
-2. Open `index.html` in your web browser.
-   - Note: Since the project uses JavaScript modules, you may need to serve the files using a local server (e.g., Live Server in VS Code, or `npx serve`).
-
 ## Usage
 
 - Use the search bar on the home page to find games.
