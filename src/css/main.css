@@ -64,7 +64,9 @@ body {
     text-decoration: none;
     font-weight: 600;
     padding: 0.35rem 0.5rem;
-    border-radius: 6px
+    border-radius: 6px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+
 }
 
 .nav-list a.active {
@@ -105,6 +107,17 @@ body {
     border: 2px solid var(--border);
     background: transparent;
     color: var(--text);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#q:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 8px rgba(66, 194, 255, 0.3);
+    outline: none;
+}
+
+#searchBtn {
+    outline: none;
 }
 
 #searchBtn {
@@ -113,7 +126,17 @@ body {
     border: none;
     background: var(--accent);
     color: var(--text);
-    cursor: pointer
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#searchBtn:hover {
+    background-color: #33aaff;
+    transform: translateY(-2px);
+}
+
+#searchBtn:active {
+    transform: translateY(0);
 }
 
 /* results grid */
@@ -177,17 +200,37 @@ body {
     cursor: pointer;
     font-weight: 700;
     font-size: 0.9rem;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, border-color 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn:active {
+    transform: translateY(0);
 }
 
 .btn--ghost {
     background: transparent;
     color: var(--accent);
-    border: 1px solid var(--border)
+    border: 1px solid var(--border);
+}
+
+.btn--ghost:hover {
+    background: rgba(66, 194, 255, 0.1);
+    border-color: var(--accent);
+
 }
 
 .btn--primary {
     background: var(--accent);
-    color: #fff
+    color: #fff;
+}
+
+.btn--primary:hover {
+    background-color: #33aaff;
+
 }
 
 /* modal */
