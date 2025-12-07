@@ -41,9 +41,15 @@ function setupEventListeners() {
 
     if (menuBtn && nav) {
         menuBtn.addEventListener('click', () => {
-            const isOpen = nav.style.display === 'flex';
-            nav.style.display = isOpen ? 'none' : 'flex';
-            menuBtn.setAttribute('aria-expanded', !isOpen);
+            const isOpen = nav.classList.toggle('open');
+            menuBtn.setAttribute('aria-expanded', isOpen);
+        });
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                nav.classList.remove('open');
+                menuBtn.setAttribute('aria-expanded', false);
+            }
         });
     }
 }

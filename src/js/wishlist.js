@@ -1,5 +1,4 @@
 import { createGameCard } from './ui.js';
-import { loadGameDetails } from './main.js';
 
 const STORAGE_KEY = 'videogame_wishlist';
 
@@ -84,7 +83,11 @@ function displayWishlist() {
         const removeBtn = container.querySelector(`[data-wishlist-id="${game.id}"]`);
 
         if (viewBtn) {
-            viewBtn.addEventListener('click', () => loadGameDetails(game.id));
+            // import dynamic
+            viewBtn.addEventListener('click', async () => {
+                const m = await import('./main.js');
+                m.loadGameDetails(game.id);
+            });
         }
 
         if (removeBtn) {
