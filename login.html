@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Gamer Journal</title>
+    <link rel="stylesheet" href="src/css/normalize.css" />
+    <link rel="stylesheet" href="src/css/main.css" />
+    <link rel="shortcut icon" href="public/favicon.png" type="image/x-icon" />
+    <script type="module" src="src/js/login.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand">
+        <img src="public/rich.svg" alt="Gamer Journal logo" class="logo" />
+        <span class="site-title">Gamer Journal</span>
+      </div>
+      <nav>
+        <ul class="nav-list">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="trending.html">Trending</a></li>
+          <li><a href="wishlist.html">Wishlist</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="container">
+      <section class="auth-section">
+        <h1>Login / Register</h1>
+        <div id="authMessage"></div>
+
+        <!-- Login Form -->
+        <form id="loginForm">
+          <h2>Login</h2>
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" required />
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" required />
+          <button type="submit">Login</button>
+        </form>
+
+        <!-- Register Form -->
+        <form id="registerForm">
+          <h2>Register</h2>
+          <label for="registerEmail">Email</label>
+          <input type="email" id="registerEmail" required />
+          <label for="registerPassword">Password</label>
+          <input type="password" id="registerPassword" required />
+          <button type="submit">Register</button>
+        </form>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Gamer Journal — Cuautla, México</p>
+    </footer>
+  </body>
+</html>
+

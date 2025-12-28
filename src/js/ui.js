@@ -1,7 +1,4 @@
-import { isInWishlist } from './wishlist.js';
-
-export function createGameCard(game) {
-    const inWishlist = isInWishlist(game.id);
+export function createGameCard(game, inWishlist = false) {
     const wishlistBtnClass = inWishlist ? 'btn btn--primary' : 'btn btn--ghost';
     const wishlistBtnText = inWishlist
         ? '<i class="fa-solid fa-heart"></i>'

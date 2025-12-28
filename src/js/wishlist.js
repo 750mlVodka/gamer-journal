@@ -1,89 +1,134 @@
 import { createGameCard } from './ui.js';
+import { supabase } from './supabase.js';
+import { getCurrentUser } from './auth.js';
 
-const STORAGE_KEY = 'videogame_wishlist';
-
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const wishlistGrid = document.getElementById('wishListGrid');
     if (wishlistGrid) {
-        displayWishlist();
+        await displayWishlist();
     }
 });
 
-// Get wishlist from localStorage
-export function getWishlist() {
+// Get wishlist from Supabase
+export async function getWishlist() {
     try {
-        const data = localStorage.getItem(STORAGE_KEY);
-        return data ? JSON.parse(data) : [];
+        const { data: { user } } = await getCurrentUser();
+        if (!user) return [];
+
+        const { data, error } = await supabase
+            .from('wishlists')
+            .select('*')
+            .eq('user_id', user.id);
+
+        if (error) {
+            console.error('Error fetching wishlist:', error);
+            return [];
+        }
+
+        return data.map(item => item.game_data);
     } catch (error) {
-        console.error('Error reading wishlist:', error);
+        console.error('Error getting wishlist:', error);
         return [];
     }
 }
 
-// Save wishlist to localStorage
-function saveWishlist(wishlist) {
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(wishlist));
-    } catch (error) {
-        console.error('Error saving wishlist:', error);
-    }
-}
-
 // Add game to wishlist
-export function addToWishlist(game) {
-    const wishlist = getWishlist();
+export async function addToWishlist(game) {
+    try {
+        const { data: { user } } = await getCurrentUser();
+        if (!user) {
+            alert('Please login to add games to wishlist');
+            window.location.href = 'login.html';
+            return;
+        }
 
-    if (!wishlist.some(item => item.id === game.id)) {
-        wishlist.push({
-            id: game.id,
-            name: game.name,
-            background_image: game.background_image,
-            released: game.released,
-            rating: game.rating,
-            genres: game.genres
-        });
-        saveWishlist(wishlist);
+        const { error } = await supabase
+            .from('wishlists')
+            .insert({
+                user_id: user.id,
+                game_id: game.id,
+                game_data: {
+                    id: game.id,
+                    name: game.name,
+                    background_image: game.background_image,
+                    released: game.released,
+                    rating: game.rating,
+                    genres: game.genres
+                }
+            });
+
+        if (error) {
+            console.error('Error adding to wishlist:', error);
+            alert('Error adding game to wishlist');
+        }
+    } catch (error) {
+        console.error('Error in addToWishlist:', error);
     }
 }
 
 // Remove game from wishlist
-export function removeFromWishlist(gameId) {
-    const wishlist = getWishlist();
-    const filtered = wishlist.filter(game => game.id !== gameId);
-    saveWishlist(filtered);
+export async function removeFromWishlist(gameId) {
+    try {
+        const { data: { user } } = await getCurrentUser();
+        if (!user) return;
 
-    const wishlistGrid = document.getElementById('wishListGrid');
-    if (wishlistGrid) {
-        displayWishlist();
+        const { error } = await supabase
+            .from('wishlists')
+            .delete()
+            .eq('user_id', user.id)
+            .eq('game_id', gameId);
+
+        if (error) {
+            console.error('Error removing from wishlist:', error);
+        }
+
+        const wishlistGrid = document.getElementById('wishListGrid');
+        if (wishlistGrid) {
+            await displayWishlist();
+        }
+    } catch (error) {
+        console.error('Error in removeFromWishlist:', error);
     }
 }
 
 // Check if game is in wishlist
-export function isInWishlist(gameId) {
-    const wishlist = getWishlist();
-    return wishlist.some(game => game.id === gameId);
+export async function isInWishlist(gameId) {
+    try {
+        const { data: { user } } = await getCurrentUser();
+        if (!user) return false;
+
+        const { data, error } = await supabase
+            .from('wishlists')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('game_id', gameId)
+            .single();
+
+        return !error && data !== null;
+    } catch (error) {
+        return false;
+    }
 }
 
 // Display wishlist page
-function displayWishlist() {
+async function displayWishlist() {
     const container = document.getElementById('wishListGrid');
     if (!container) return;
 
-    const wishlist = getWishlist();
+    const wishlist = await getWishlist();
 
     if (wishlist.length === 0) {
         container.innerHTML = '<p style="color: var(--muted); text-align: center; padding: 2rem;">Your wishlist is empty. Start adding games!</p>';
         return;
     }
 
-    container.innerHTML = wishlist.map(game => createGameCard(game)).join('');
+    container.innerHTML = wishlist.map(game => createGameCard(game, true)).join('');
 
     wishlist.forEach(game => {
         const viewBtn = container.querySelector(`[data-game-id="${game.id}"]`);
         const removeBtn = container.querySelector(`[data-wishlist-id="${game.id}"]`);
 
         if (viewBtn) {
-            // import dynamic
             viewBtn.addEventListener('click', async () => {
                 const m = await import('./main.js');
                 m.loadGameDetails(game.id);
@@ -91,8 +136,8 @@ function displayWishlist() {
         }
 
         if (removeBtn) {
-            removeBtn.addEventListener('click', () => {
-                removeFromWishlist(game.id);
+            removeBtn.addEventListener('click', async () => {
+                await removeFromWishlist(game.id);
             });
         }
     });

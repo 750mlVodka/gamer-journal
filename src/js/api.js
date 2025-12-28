@@ -1,4 +1,4 @@
-const API_KEY = 'fa15ac885d114a8a891fcb203c0b9e9b';
+const API_KEY = '6a92768abe664fe9af32d53d0c5c7d34';
 const BASE = 'https://api.rawg.io/api';
 
 async function safeFetch(url) {

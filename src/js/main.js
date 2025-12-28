@@ -1,12 +1,15 @@
 import { createGameCard, openModal, closeModal } from './ui.js';
 import { addToWishlist, removeFromWishlist, isInWishlist } from './wishlist.js';
+import { getCurrentUser, signOut, onAuthStateChange } from './auth.js';
 
 const API_KEY = 'fa15ac885d114a8a891fcb203c0b9e9b';
 const BASE_URL = 'https://api.rawg.io/api';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    await checkAuth();
     setupEventListeners();
     updateFooter();
+    updateNavAuthState();
 
     if (document.getElementById('trendingGrid')) {
         loadTrending();
@@ -107,13 +110,20 @@ async function loadTrending() {
 }
 
 // Display games in grid
-function displayGames(games, container) {
+async function displayGames(games, container) {
     if (!games || games.length === 0) {
         container.innerHTML = '<p>No games found.</p>';
         return;
     }
 
-    container.innerHTML = games.map(game => createGameCard(game)).join('');
+    // Check wishlist status for all games
+    const wishlistStatus = await Promise.all(
+        games.map(game => isInWishlist(game.id))
+    );
+
+    container.innerHTML = games.map((game, index) => 
+        createGameCard(game, wishlistStatus[index])
+    ).join('');
 
     games.forEach(game => {
         const viewBtn = container.querySelector(`[data-game-id="${game.id}"]`);
@@ -160,14 +170,16 @@ async function loadGameDetails(gameId) {
 }
 
 // Toggle wishlist
-function toggleWishlist(game, button) {
-    if (isInWishlist(game.id)) {
-        removeFromWishlist(game.id);
+async function toggleWishlist(game, button) {
+    const inWishlist = await isInWishlist(game.id);
+    
+    if (inWishlist) {
+        await removeFromWishlist(game.id);
         button.innerHTML = '<i class="fa-regular fa-heart"></i>';
         button.classList.remove('btn--primary');
         button.classList.add('btn--ghost');
     } else {
-        addToWishlist(game);
+        await addToWishlist(game);
         button.innerHTML = '<i class="fa-solid fa-heart"></i>';
         button.classList.remove('btn--ghost');
         button.classList.add('btn--primary');
@@ -184,6 +196,38 @@ function updateFooter() {
     if (yearSpan) {
         yearSpan.textContent = new Date().getFullYear();
     }
+}
+
+// Check authentication
+async function checkAuth() {
+    const { data: { user } } = await getCurrentUser();
+    if (!user && window.location.pathname.includes('wishlist.html')) {
+        window.location.href = 'login.html';
+    }
+}
+
+// Update navigation with auth state
+async function updateNavAuthState() {
+    const { data: { user } } = await getCurrentUser();
+    const nav = document.getElementById('primaryNav');
+    if (!nav) return;
+
+    // Remove existing auth buttons
+    const existingAuthBtn = nav.querySelector('.auth-btn');
+    if (existingAuthBtn) existingAuthBtn.remove();
+
+    const li = document.createElement('li');
+    if (user) {
+        li.innerHTML = `<a href="#" class="auth-btn" id="logoutBtn">Logout (${user.email})</a>`;
+        li.querySelector('#logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await signOut();
+            window.location.href = 'index.html';
+        });
+    } else {
+        li.innerHTML = '<a href="login.html" class="auth-btn">Login</a>';
+    }
+    nav.appendChild(li);
 }
 
 export { loadGameDetails, toggleWishlist };
