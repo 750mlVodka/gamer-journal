@@ -1,5 +1,9 @@
-const API_KEY = import.meta.env.RAWG_API_KEY;
+const API_KEY = import.meta.env.VITE_RAWG_API_KEY;
 const BASE = 'https://api.rawg.io/api';
+
+if (!API_KEY) {
+    console.error('VITE_RAWG_API_KEY is not defined. Please create a .env file with your RAWG API key.');
+}
 
 async function safeFetch(url) {
     try {
