@@ -24,7 +24,10 @@ export async function getGameDetails(id) {
 }
 
 export async function getTrending(page_size = 12) {
-    const url = `${BASE}/games/lists/popular?key=${API_KEY}&page_size=${page_size}`;
+    const today = new Date();
+    const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+    const dates = `${lastMonth.toISOString().split('T')[0]},${today.toISOString().split('T')[0]}`;
+    const url = `${BASE}/games?key=${API_KEY}&dates=${dates}&ordering=-added&page_size=${page_size}`;
     return await safeFetch(url);
 }
 

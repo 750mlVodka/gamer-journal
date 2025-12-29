@@ -12,6 +12,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Get wishlist from Supabase
 export async function getWishlist() {
     try {
+        if (!supabase) return [];
+
         const { data: { user } } = await getCurrentUser();
         if (!user) return [];
 
@@ -35,8 +37,13 @@ export async function getWishlist() {
 // Add game to wishlist
 export async function addToWishlist(game) {
     try {
-        const { data: { user } } = await getCurrentUser();
-        if (!user) {
+        if (!supabase) {
+            alert('Supabase not configured. Please configure your .env file.');
+            return;
+        }
+
+        const { data: { user }, error: userError } = await getCurrentUser();
+        if (userError || !user) {
             alert('Please login to add games to wishlist');
             window.location.href = 'login.html';
             return;
@@ -69,6 +76,8 @@ export async function addToWishlist(game) {
 // Remove game from wishlist
 export async function removeFromWishlist(gameId) {
     try {
+        if (!supabase) return;
+
         const { data: { user } } = await getCurrentUser();
         if (!user) return;
 
@@ -94,17 +103,19 @@ export async function removeFromWishlist(gameId) {
 // Check if game is in wishlist
 export async function isInWishlist(gameId) {
     try {
-        const { data: { user } } = await getCurrentUser();
-        if (!user) return false;
+        if (!supabase) return false;
 
-        const { data, error } = await supabase
+        const { data: { user }, error: userError } = await getCurrentUser();
+        if (userError || !user) return false;
+
+        const { data, error: queryError } = await supabase
             .from('wishlists')
             .select('id')
             .eq('user_id', user.id)
             .eq('game_id', gameId)
             .single();
 
-        return !error && data !== null;
+        return !queryError && data !== null;
     } catch (error) {
         return false;
     }

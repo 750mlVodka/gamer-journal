@@ -1,15 +1,19 @@
 import { createGameCard, openModal, closeModal } from './ui.js';
 import { addToWishlist, removeFromWishlist, isInWishlist } from './wishlist.js';
 import { getCurrentUser, signOut, onAuthStateChange } from './auth.js';
-
-const API_KEY = 'fa15ac885d114a8a891fcb203c0b9e9b';
-const BASE_URL = 'https://api.rawg.io/api';
+import { searchGames, getGameDetails, getTrending } from './api.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    await checkAuth();
     setupEventListeners();
     updateFooter();
-    updateNavAuthState();
+
+    // Auth check no bloquea el resto de la app
+    try {
+        await checkAuth();
+        await updateNavAuthState();
+    } catch (error) {
+        console.warn('Auth check failed, continuing without auth:', error);
+    }
 
     if (document.getElementById('trendingGrid')) {
         loadTrending();
@@ -68,13 +72,7 @@ async function handleSearch(e) {
     resultsContainer.innerHTML = '<p>Searching...</p>';
 
     try {
-        const response = await fetch(`${BASE_URL}/games?key=${API_KEY}&search=${encodeURIComponent(query)}&page_size=15`);
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch games');
-        }
-
-        const data = await response.json();
+        const data = await searchGames(query, 15);
         displayGames(data.results, resultsContainer);
 
     } catch (error) {
@@ -88,19 +86,8 @@ async function loadTrending() {
     const container = document.getElementById('trendingGrid');
     container.innerHTML = '<p>Loading trending games...</p>';
 
-    const today = new Date();
-    const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
-
-    const dates = `${formatDate(lastMonth)},${formatDate(today)}`;
-
     try {
-        const response = await fetch(`${BASE_URL}/games?key=${API_KEY}&dates=${dates}&ordering=-added&page_size=15`);
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch trending games');
-        }
-
-        const data = await response.json();
+        const data = await getTrending(15);
         displayGames(data.results, container);
 
     } catch (error) {
@@ -116,12 +103,18 @@ async function displayGames(games, container) {
         return;
     }
 
-    // Check wishlist status for all games
-    const wishlistStatus = await Promise.all(
-        games.map(game => isInWishlist(game.id))
-    );
+    // Check wishlist status for all games (con manejo de errores)
+    let wishlistStatus = [];
+    try {
+        wishlistStatus = await Promise.all(
+            games.map(game => isInWishlist(game.id).catch(() => false))
+        );
+    } catch (error) {
+        // Si falla, asumir que ningún juego está en wishlist
+        wishlistStatus = games.map(() => false);
+    }
 
-    container.innerHTML = games.map((game, index) => 
+    container.innerHTML = games.map((game, index) =>
         createGameCard(game, wishlistStatus[index])
     ).join('');
 
@@ -142,13 +135,7 @@ async function displayGames(games, container) {
 // details modal
 async function loadGameDetails(gameId) {
     try {
-        const response = await fetch(`${BASE_URL}/games/${gameId}?key=${API_KEY}`);
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch game details');
-        }
-
-        const game = await response.json();
+        const game = await getGameDetails(gameId);
 
         const modalBody = document.getElementById('modalBody');
         modalBody.innerHTML = `
@@ -172,7 +159,7 @@ async function loadGameDetails(gameId) {
 // Toggle wishlist
 async function toggleWishlist(game, button) {
     const inWishlist = await isInWishlist(game.id);
-    
+
     if (inWishlist) {
         await removeFromWishlist(game.id);
         button.innerHTML = '<i class="fa-regular fa-heart"></i>';
@@ -186,9 +173,6 @@ async function toggleWishlist(game, button) {
     }
 }
 
-function formatDate(date) {
-    return date.toISOString().split('T')[0];
-}
 
 // Update footer year
 function updateFooter() {
@@ -200,34 +184,44 @@ function updateFooter() {
 
 // Check authentication
 async function checkAuth() {
-    const { data: { user } } = await getCurrentUser();
-    if (!user && window.location.pathname.includes('wishlist.html')) {
-        window.location.href = 'login.html';
+    try {
+        const { data: { user } } = await getCurrentUser();
+        if (!user && window.location.pathname.includes('wishlist.html')) {
+            window.location.href = 'login.html';
+        }
+    } catch (error) {
+        // Si no hay Supabase configurado, permitir acceso sin auth
+        console.warn('Auth not available:', error);
     }
 }
 
 // Update navigation with auth state
 async function updateNavAuthState() {
-    const { data: { user } } = await getCurrentUser();
-    const nav = document.getElementById('primaryNav');
-    if (!nav) return;
+    try {
+        const { data: { user } } = await getCurrentUser();
+        const nav = document.getElementById('primaryNav');
+        if (!nav) return;
 
-    // Remove existing auth buttons
-    const existingAuthBtn = nav.querySelector('.auth-btn');
-    if (existingAuthBtn) existingAuthBtn.remove();
+        // Remove existing auth buttons
+        const existingAuthBtn = nav.querySelector('.auth-btn');
+        if (existingAuthBtn) existingAuthBtn.remove();
 
-    const li = document.createElement('li');
-    if (user) {
-        li.innerHTML = `<a href="#" class="auth-btn" id="logoutBtn">Logout (${user.email})</a>`;
-        li.querySelector('#logoutBtn').addEventListener('click', async (e) => {
-            e.preventDefault();
-            await signOut();
-            window.location.href = 'index.html';
-        });
-    } else {
-        li.innerHTML = '<a href="login.html" class="auth-btn">Login</a>';
+        const li = document.createElement('li');
+        if (user) {
+            li.innerHTML = `<a href="#" class="auth-btn" id="logoutBtn">Logout (${user.email})</a>`;
+            li.querySelector('#logoutBtn').addEventListener('click', async (e) => {
+                e.preventDefault();
+                await signOut();
+                window.location.href = 'index.html';
+            });
+        } else {
+            li.innerHTML = '<a href="login.html" class="auth-btn">Login</a>';
+        }
+        nav.appendChild(li);
+    } catch (error) {
+        // Si no hay Supabase, no mostrar botón de auth
+        console.warn('Auth state update failed:', error);
     }
-    nav.appendChild(li);
 }
 
 export { loadGameDetails, toggleWishlist };
