@@ -24,6 +24,4 @@ dist-ssr
 *.sln
 *.sw?
 
-api.js
-main.js
 SUPABASE_INTEGRATION_GUIDE.md
