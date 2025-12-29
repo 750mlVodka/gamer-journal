@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile - Gamer Journal</title>
+    <link rel="stylesheet" href="src/css/normalize.css" />
+    <link rel="stylesheet" href="src/css/main.css" />
+    <link rel="shortcut icon" href="/favicon.png" type="image/x-icon" />
+    <script type="module" src="src/js/profile.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand">
+        <img src="/rich.svg" alt="Gamer Journal logo" class="logo" />
+        <span class="site-title">Gamer Journal</span>
+      </div>
+      <nav>
+        <button id="menuBtn" aria-expanded="false" aria-controls="primaryNav">☰</button>
+        <ul id="primaryNav" class="nav-list">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="trending.html">Trending</a></li>
+          <li><a href="wishlist.html">Wishlist</a></li>
+        </ul>
+        <div id="userMenu" class="user-menu" style="display: none;">
+          <button id="avatarBtn" class="avatar-btn" aria-label="User menu">
+            <span class="avatar">👤</span>
+          </button>
+          <div id="userDropdown" class="user-dropdown">
+            <div class="user-info">
+              <span id="userNickname" class="user-nickname"></span>
+              <span id="userEmail" class="user-email"></span>
+            </div>
+            <a href="profile.html" class="dropdown-item">Profile</a>
+            <button id="logoutBtn" class="dropdown-item">Logout</button>
+          </div>
+        </div>
+        <a href="login.html" id="loginLink" class="auth-link" style="display: none;">Login</a>
+      </nav>
+    </header>
+
+    <main class="container">
+      <section class="profile-section">
+        <div id="profileView" class="profile-view">
+          <div class="profile-header">
+            <div class="profile-avatar">
+              <span class="avatar-large" id="profileAvatar">👤</span>
+            </div>
+            <div class="profile-info">
+              <h1 id="profileNickname">Loading...</h1>
+              <p id="profileUsername" class="profile-username"></p>
+              <p id="profileBio" class="profile-bio"></p>
+            </div>
+            <button id="editProfileBtn" class="btn btn--ghost" style="display: none;">Edit Profile</button>
+          </div>
+
+          <div class="profile-stats">
+            <div class="stat-item">
+              <span class="stat-number" id="wishlistCount">0</span>
+              <span class="stat-label">Games in Wishlist</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number" id="memberSince">-</span>
+              <span class="stat-label">Member Since</span>
+            </div>
+          </div>
+
+          <div class="profile-wishlist">
+            <h2>Public Wishlist</h2>
+            <div id="publicWishlist" class="results"></div>
+          </div>
+        </div>
+
+        <div id="profileEdit" class="profile-edit" style="display: none;">
+          <h1>Edit Profile</h1>
+          <div id="profileMessage" class="auth-message"></div>
+          
+          <form id="profileForm" class="auth-form active">
+            <div class="form-group">
+              <label for="nickname">Nickname</label>
+              <input type="text" id="nickname" placeholder="Your nickname" maxlength="30" />
+            </div>
+            <div class="form-group">
+              <label for="username">Username (unique)</label>
+              <input type="text" id="username" placeholder="username" maxlength="20" pattern="[a-z0-9_]+" />
+              <small>Lowercase letters, numbers, and underscores only</small>
+            </div>
+            <div class="form-group">
+              <label for="bio">Bio</label>
+              <textarea id="bio" placeholder="Tell us about yourself..." maxlength="200" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="isPublic" checked />
+                Make profile public
+              </label>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn--primary">Save Changes</button>
+              <button type="button" id="cancelEditBtn" class="btn btn--ghost">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Gamer Journal — Cuautla, México</p>
+    </footer>
+  </body>
+</html>
+

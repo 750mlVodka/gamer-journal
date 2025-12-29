@@ -2,6 +2,7 @@ import { createGameCard, openModal, closeModal } from './ui.js';
 import { addToWishlist, removeFromWishlist, isInWishlist } from './wishlist.js';
 import { getCurrentUser, signOut, onAuthStateChange } from './auth.js';
 import { searchGames, getGameDetails, getTrending } from './api.js';
+import { supabase } from './supabase.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     setupEventListeners();
@@ -199,29 +200,73 @@ async function checkAuth() {
 async function updateNavAuthState() {
     try {
         const { data: { user } } = await getCurrentUser();
-        const nav = document.getElementById('primaryNav');
-        if (!nav) return;
+        const userMenu = document.getElementById('userMenu');
+        const loginLink = document.getElementById('loginLink');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const avatarBtn = document.getElementById('avatarBtn');
 
-        // Remove existing auth buttons
-        const existingAuthBtn = nav.querySelector('.auth-btn');
-        if (existingAuthBtn) existingAuthBtn.remove();
-
-        const li = document.createElement('li');
         if (user) {
-            li.innerHTML = `<a href="#" class="auth-btn" id="logoutBtn">Logout (${user.email})</a>`;
-            li.querySelector('#logoutBtn').addEventListener('click', async (e) => {
-                e.preventDefault();
-                await signOut();
-                window.location.href = 'index.html';
+            // Show user menu, hide login link
+            if (userMenu) userMenu.style.display = 'block';
+            if (loginLink) loginLink.style.display = 'none';
+
+            // Load user profile (nickname)
+            const nickname = await getUserNickname(user.id);
+            const nicknameEl = document.getElementById('userNickname');
+            const emailEl = document.getElementById('userEmail');
+            
+            if (nicknameEl) nicknameEl.textContent = nickname || user.email.split('@')[0];
+            if (emailEl) emailEl.textContent = user.email;
+
+            // Toggle dropdown
+            if (avatarBtn) {
+                avatarBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    userMenu?.classList.toggle('active');
+                });
+            }
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!userMenu?.contains(e.target)) {
+                    userMenu?.classList.remove('active');
+                }
             });
+
+            // Logout
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    await signOut();
+                    window.location.href = 'index.html';
+                });
+            }
         } else {
-            li.innerHTML = '<a href="login.html" class="auth-btn">Login</a>';
+            // Hide user menu, show login link
+            if (userMenu) userMenu.style.display = 'none';
+            if (loginLink) loginLink.style.display = 'block';
         }
-        nav.appendChild(li);
     } catch (error) {
-        // Si no hay Supabase, no mostrar botón de auth
         console.warn('Auth state update failed:', error);
     }
 }
 
-export { loadGameDetails, toggleWishlist };
+// Get user nickname from profile
+async function getUserNickname(userId) {
+    try {
+        const { supabase } = await import('./supabase.js');
+        if (!supabase) return null;
+
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('nickname')
+            .eq('user_id', userId)
+            .single();
+
+        return data?.nickname || null;
+    } catch (error) {
+        return null;
+    }
+}
+
+export { loadGameDetails, toggleWishlist, updateNavAuthState, getUserNickname };

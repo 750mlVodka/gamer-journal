@@ -18,6 +18,10 @@
     <script type="module" src="src/js/main.js"></script>
     <script type="module" src="src/js/ui.js"></script>
     <script type="module" src="src/js/wishlist.js"></script>
+    <script type="module">
+        import { updateNavAuthState } from './src/js/main.js';
+        document.addEventListener('DOMContentLoaded', () => updateNavAuthState());
+    </script>
     <script src="https://kit.fontawesome.com/653120ec51.js" crossorigin="anonymous"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -39,6 +43,20 @@
                 <li><a href="trending.html">Trending</a></li>
                 <li><a href="wishlist.html" class="active">Wishlist</a></li>
             </ul>
+            <div id="userMenu" class="user-menu" style="display: none;">
+                <button id="avatarBtn" class="avatar-btn" aria-label="User menu">
+                    <span class="avatar">👤</span>
+                </button>
+                <div id="userDropdown" class="user-dropdown">
+                    <div class="user-info">
+                        <span id="userNickname" class="user-nickname"></span>
+                        <span id="userEmail" class="user-email"></span>
+                    </div>
+                    <a href="profile.html" class="dropdown-item">Profile</a>
+                    <button id="logoutBtn" class="dropdown-item">Logout</button>
+                </div>
+            </div>
+            <a href="login.html" id="loginLink" class="auth-link" style="display: none;">Login</a>
         </nav>
     </header>
 
