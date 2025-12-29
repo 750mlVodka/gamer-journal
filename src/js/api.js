@@ -1,4 +1,4 @@
-const API_KEY = import.meta.env.VITE_RAWG_API_KEY || '6a92768abe664fe9af32d53d0c5c7d34';
+const API_KEY = import.meta.env.VITE_RAWG_API_KEY;
 const BASE = 'https://api.rawg.io/api';
 
 async function safeFetch(url) {
