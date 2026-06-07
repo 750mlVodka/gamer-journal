@@ -1,4 +1,4 @@
-import { createGameCard } from './ui.js';
+import { createGameCard, loadGameDetails } from './ui.js';
 import { supabase } from './supabase.js';
 import { getCurrentUser } from './auth.js';
 
@@ -31,6 +31,31 @@ export async function getWishlist() {
     } catch (error) {
         console.error('Error getting wishlist:', error);
         return [];
+    }
+}
+
+// Get only wishlist game IDs for the current user
+export async function getWishlistIds() {
+    try {
+        if (!supabase) return new Set();
+
+        const { data: { user } } = await getCurrentUser();
+        if (!user) return new Set();
+
+        const { data, error } = await supabase
+            .from('wishlists')
+            .select('game_id')
+            .eq('user_id', user.id);
+
+        if (error) {
+            console.error('Error fetching wishlist ids:', error);
+            return new Set();
+        }
+
+        return new Set(data.map(item => item.game_id));
+    } catch (error) {
+        console.error('Error getting wishlist ids:', error);
+        return new Set();
     }
 }
 
@@ -141,8 +166,7 @@ async function displayWishlist() {
 
         if (viewBtn) {
             viewBtn.addEventListener('click', async () => {
-                const m = await import('./main.js');
-                m.loadGameDetails(game.id);
+                loadGameDetails(game.id);
             });
         }
 

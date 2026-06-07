@@ -1,3 +1,5 @@
+import { getGameDetails } from './api.js';
+
 export function createGameCard(game, inWishlist = false) {
     const wishlistBtnClass = inWishlist ? 'btn btn--primary' : 'btn btn--ghost';
     const wishlistBtnText = inWishlist
@@ -41,3 +43,27 @@ export function closeModal() {
         modal.setAttribute('aria-hidden', 'true');
     }
 }
+
+// Load game details into modal
+export async function loadGameDetails(gameId) {
+    try {
+        const game = await getGameDetails(gameId);
+
+        const modalBody = document.getElementById('modalBody');
+        modalBody.innerHTML = `
+            <img src="${game.background_image}" alt="${game.name}">
+            <h2>${game.name}</h2>
+            <p class="released"><strong>Released:</strong> ${game.released || 'N/A'}</p>
+            <p class="rating"><strong>Rating:</strong> ${game.rating || 'N/A'} / 5</p>
+            <p class="genres"><strong>Genres:</strong> ${game.genres?.map(g => g.name).join(', ') || 'N/A'}</p>
+            <p class="platfomrs"><strong>Platforms:</strong> ${game.platforms?.map(p => p.platform.name).join(', ') || 'N/A'}</p>
+            <p class="desc">${game.description_raw?.substring(0, 1000) || 'No description available.'}...</p>
+        `;
+
+        openModal();
+
+    } catch (error) {
+        console.error('Details error:', error);
+        alert('Error loading game details');
+    }
+}

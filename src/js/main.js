@@ -1,5 +1,5 @@
-import { createGameCard, openModal, closeModal } from './ui.js';
-import { addToWishlist, removeFromWishlist, isInWishlist } from './wishlist.js';
+import { createGameCard, openModal, closeModal, loadGameDetails } from './ui.js';
+import { addToWishlist, removeFromWishlist, isInWishlist, getWishlistIds } from './wishlist.js';
 import { getCurrentUser, signOut, onAuthStateChange } from './auth.js';
 import { searchGames, getGameDetails, getTrending } from './api.js';
 import { supabase } from './supabase.js';
@@ -104,16 +104,15 @@ async function displayGames(games, container) {
         return;
     }
 
-    // Check wishlist status for all games (con manejo de errores)
-    let wishlistStatus = [];
+    // Fetch all wishlist IDs for current user once to prevent N+1 queries
+    let userWishlistIds = new Set();
     try {
-        wishlistStatus = await Promise.all(
-            games.map(game => isInWishlist(game.id).catch(() => false))
-        );
+        userWishlistIds = await getWishlistIds();
     } catch (error) {
-        // Si falla, asumir que ningún juego está en wishlist
-        wishlistStatus = games.map(() => false);
+        console.warn('Could not fetch wishlist ids:', error);
     }
+
+    const wishlistStatus = games.map(game => userWishlistIds.has(game.id));
 
     container.innerHTML = games.map((game, index) =>
         createGameCard(game, wishlistStatus[index])
@@ -133,29 +132,6 @@ async function displayGames(games, container) {
     });
 }
 
-// details modal
-async function loadGameDetails(gameId) {
-    try {
-        const game = await getGameDetails(gameId);
-
-        const modalBody = document.getElementById('modalBody');
-        modalBody.innerHTML = `
-            <img src="${game.background_image}" alt="${game.name}">
-            <h2>${game.name}</h2>
-            <p class="released"><strong>Released:</strong> ${game.released || 'N/A'}</p>
-            <p class="rating"><strong>Rating:</strong> ${game.rating || 'N/A'} / 5</p>
-            <p class="genres"><strong>Genres:</strong> ${game.genres?.map(g => g.name).join(', ') || 'N/A'}</p>
-            <p class="platfomrs"><strong>Platforms:</strong> ${game.platforms?.map(p => p.platform.name).join(', ') || 'N/A'}</p>
-            <p class="desc">${game.description_raw?.substring(0, 1000) || 'No description available.'}...</p>
-        `;
-
-        openModal();
-
-    } catch (error) {
-        console.error('Details error:', error);
-        alert('Error loading game details');
-    }
-}
 
 // Toggle wishlist
 async function toggleWishlist(game, button) {
@@ -269,4 +245,4 @@ async function getUserNickname(userId) {
     }
 }
 
-export { loadGameDetails, toggleWishlist, updateNavAuthState, getUserNickname };
+export { toggleWishlist, updateNavAuthState, getUserNickname };
