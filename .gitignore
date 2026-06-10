@@ -24,4 +24,4 @@ dist-ssr
 *.sln
 *.sw?
 
-SUPABASE_INTEGRATION_GUIDE.md
+SUPABASE_SCHEMA.sql

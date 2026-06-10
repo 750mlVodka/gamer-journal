@@ -1,6 +1,5 @@
 -- ==============================================================================
 -- GAMER JOURNAL: SUPABASE DATABASE SCHEMA
--- Ejecuta todo este script en el SQL Editor de tu panel de control de Supabase.
 -- ==============================================================================
 
 -- 1. CREAR TABLA: profiles
