@@ -1,30 +1,46 @@
 # Gamer Journal
 
-Gamer Journal is a web application that allows users to search and explore video games using the RAWG database. Users can view game details and add their favorite games to a wishlist.
+Gamer Journal is a web application that allows users to search and explore video games, view trending titles, and manage a personal wishlist. The app features secure user authentication and database management.
 
-## Features
+## 🚀 Features (Funciones del Proyecto)
 
-- **Search Games**: Search for video games by title.
-- **View Details**: View detailed information about each game.
-- **Wishlist**: Add games to your personal wishlist for future reference.
-- **Trending**: Explore trending games (functionality implied by `trending.html`).
+- **User Authentication (Autenticación):** Secure user registration and login system.
+- **Search Games (Búsqueda de Juegos):** Search for any video game by title to see relevant results.
+- **Game Details (Detalles del Juego):** View comprehensive information about each game, including ratings, release dates, and platforms.
+- **Trending Games (Juegos en Tendencia):** Explore currently popular and trending video games.
+- **Personal Wishlist (Lista de Deseos):** Log in to add favorite games to a personal wishlist, saved securely in the cloud.
 
-## Technologies Used
+## 🔌 APIs and Services Used
+
+This project relies on two main services to provide its functionality:
+
+1. **[RAWG Video Games Database API](https://rawg.io/apidocs):** 
+   - Used to fetch all game-related data, including search results, trending lists, and detailed game information.
+
+2. **[Supabase](https://supabase.com/):**
+   - **Authentication:** Handles user registration, login, and session management.
+   - **Database (PostgreSQL):** Stores user profiles and their individual wishlists securely in the cloud.
+
+## 🛠️ Technologies Used
 
 - HTML5
 - CSS3 (Normalize.css, Custom Styles)
-- JavaScript (ES6 Modules)
-- [RAWG Video Games Database API](https://rawg.io/apidocs)
+- JavaScript (ES6 Modules, Vite)
+- RAWG API (Game Data)
+- Supabase (Backend as a Service)
 
-## GitHub Page Link
-[Gamer Journal GitHub Page](https://750mlvodka.github.io/gamer-journal/)
+## 🔗 Links
 
-## Usage
+- **GitHub Page:** [Gamer Journal GitHub Page](https://750mlvodka.github.io/gamer-journal/)
 
-- Use the search bar on the home page to find games.
-- Click on a game card to view more details.
-- Navigate to the "Trending" or "Wishlist" pages using the navigation menu.
+## 💻 Usage
 
-## Author
+1. Create an account or log in from the Authentication page.
+2. Use the search bar on the home page to find games or explore the "Trending" section.
+3. Click on a game card to view more details.
+4. Click the "Add to Wishlist" button on any game to save it to your personal list.
+5. Access your "Wishlist" from the navigation menu to see your saved games.
+
+## 👤 Author
 
 Yamsir Hernandez
