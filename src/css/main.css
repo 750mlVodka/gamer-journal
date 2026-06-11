@@ -26,9 +26,10 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 0.75rem 1rem;
-    background: transparent;
+    background: var(--bg-dark);
     border-bottom: 1px solid var(--border);
     position: relative;
+    z-index: 100;
 }
 
 .brand {
@@ -333,6 +334,7 @@ nav {
     padding: 1rem;
     border: 1px solid var(--border);
     border-top: none;
+    z-index: 1000;
 }
 
 /* container */
@@ -493,10 +495,11 @@ nav {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.7);
     align-items: center;
     justify-content: center;
-    padding: 1rem
+    padding: 1rem;
+    z-index: 2000;
 }
 
 .modal[aria-hidden="false"] {
@@ -508,9 +511,12 @@ nav {
     border-radius: 8px;
     max-width: 820px;
     width: 100%;
-    padding: 1rem;
+    padding: 3.5rem 1.5rem 1.5rem 1.5rem;
     border: 1px solid var(--border);
-    outline: 0
+    outline: 0;
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 #modalBody img {
@@ -537,14 +543,28 @@ nav {
 }
 
 .modal-close {
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-size: 1.5rem;
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 2rem;
     position: absolute;
-    right: 1rem;
-    top: 1rem;
-    cursor: pointer
+    right: 1.5rem;
+    top: 1.5rem;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.modal-close:hover {
+    background: #ff4444;
+    color: #fff;
+    border-color: #ff4444;
 }
 
 /* footer */
