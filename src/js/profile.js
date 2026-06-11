@@ -201,14 +201,14 @@ async function saveProfile(userId) {
 
     const { error } = await supabase
       .from("profiles")
-      .upsert({
-        user_id: userId,
+      .update({
         nickname: nickname || null,
         username: username || null,
         bio: bio || null,
         is_public: isPublic,
         updated_at: new Date().toISOString(),
-      });
+      })
+      .eq("user_id", userId);
 
     if (error) {
       showMessage(error.message, "error");
