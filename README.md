@@ -10,19 +10,19 @@
 
 Gamer Journal is a web application that allows users to search and explore video games, view trending titles, and manage a personal wishlist. The app features secure user authentication and database management.
 
-## Features (Funciones del Proyecto)
+## Features
 
-- **User Authentication (Autenticación):** Secure user registration and login system.
-- **Search Games (Búsqueda de Juegos):** Search for any video game by title to see relevant results.
-- **Game Details (Detalles del Juego):** View comprehensive information about each game, including ratings, release dates, and platforms.
-- **Trending Games (Juegos en Tendencia):** Explore currently popular and trending video games.
-- **Personal Wishlist (Lista de Deseos):** Log in to add favorite games to a personal wishlist, saved securely in the cloud.
+- **User Authentication:** Secure user registration and login system.
+- **Search Games:** Search for any video game by title to see relevant results.
+- **Game Details:** View comprehensive information about each game, including ratings, release dates, and platforms.
+- **Trending Games:** Explore currently popular and trending video games.
+- **Personal Wishlist:** Log in to add favorite games to a personal wishlist, saved securely in the cloud.
 
 ## APIs and Services Used
 
 This project relies on two main services to provide its functionality:
 
-1. **[RAWG Video Games Database API](https://rawg.io/apidocs):** 
+1. **[RAWG Video Games Database API](https://rawg.io/apidocs):**
    - Used to fetch all game-related data, including search results, trending lists, and detailed game information.
 
 2. **[Supabase](https://supabase.com/):**
