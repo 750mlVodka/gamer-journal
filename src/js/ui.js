@@ -33,6 +33,7 @@ export function openModal() {
     if (modal) {
         modal.setAttribute('aria-hidden', 'false');
         modal.querySelector('.modal-content')?.focus();
+        document.body.style.overflow = 'hidden';
     }
 }
 
@@ -41,6 +42,7 @@ export function closeModal() {
     const modal = document.getElementById('modal');
     if (modal) {
         modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
     }
 }
 
