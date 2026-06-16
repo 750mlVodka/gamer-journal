@@ -1,0 +1,32 @@
+/* Light theme overrides */
+:root[data-theme="light"] {
+    --bg-dark: #F5F5F7;
+    --bg-card: #FFFFFF;
+    --accent: #007AFF;
+    --muted: #666666;
+    --text: #1C1C1E;
+    --border: #D1D1D6;
+}
+
+/* Theme toggle button */
+#themeToggleBtn {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s ease, transform 0.2s ease;
+    padding: 0.5rem;
+}
+
+#themeToggleBtn:hover {
+    color: var(--accent);
+    transform: scale(1.1);
+}
+
+body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}

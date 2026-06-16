@@ -13,8 +13,10 @@
 
     <link rel="stylesheet" href="src/css/normalize.css" />
     <link rel="stylesheet" href="src/css/main.css" />
+    <link rel="stylesheet" href="src/css/theme.css" />
     <link rel="shortcut icon" href="/favicon.png" type="image/x-icon">
 
+    <script src="src/js/theme.js"></script>
     <script type="module" src="src/js/main.js"></script>
     <script src="https://kit.fontawesome.com/653120ec51.js" crossorigin="anonymous"></script>
 
@@ -33,6 +35,9 @@
             </a>
         </div>
         <nav>
+            <button id="themeToggleBtn" aria-label="Cambiar tema">
+                <i class="fa-solid fa-toggle-on"></i>
+            </button>
             <button id="menuBtn" aria-expanded="false" aria-controls="primaryNav">☰</button>
             <ul id="primaryNav" class="nav-list">
                 <li><a href="index.html" class="active">Home</a></li>

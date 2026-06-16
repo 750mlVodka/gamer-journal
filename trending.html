@@ -5,6 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <!-- HTML Meta Tags -->
     <title>Gamer Journal — Trending</title>
     <meta name="description"
@@ -13,8 +20,10 @@
 
     <link rel="stylesheet" href="src/css/normalize.css" />
     <link rel="stylesheet" href="src/css/main.css" />
+    <link rel="stylesheet" href="src/css/theme.css" />
     <link rel="shortcut icon" href="/favicon.png" type="image/x-icon">
 
+    <script src="src/js/theme.js"></script>
     <script type="module" src="src/js/main.js"></script>
     <script type="module">
         import { updateNavAuthState } from './src/js/main.js';
@@ -37,6 +46,9 @@
             </a>
         </div>
         <nav>
+            <button id="themeToggleBtn" aria-label="Cambiar tema">
+                <i class="fa-solid fa-toggle-on"></i>
+            </button>
             <button id="menuBtn" aria-expanded="false" aria-controls="primaryNav">☰</button>
             <ul id="primaryNav" class="nav-list">
                 <li><a href="index.html">Home</a></li>
