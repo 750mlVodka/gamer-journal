@@ -39,7 +39,7 @@ This project relies on two main services to provide its functionality:
 
 ## Links
 
-- **GitHub Page:** [Gamer Journal GitHub Page](https://750mlvodka.github.io/gamer-journal/)
+- **GitHub Page:** [Gamer Journal GitHub Page](https://gamer-journal.netlify.app/)
 
 ## Usage
 
