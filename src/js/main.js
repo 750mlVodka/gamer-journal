@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupEventListeners();
     updateFooter();
 
-    // Auth check no bloquea el resto de la app
+    // Auth check no block app
     try {
         await checkAuth();
         await updateNavAuthState();
@@ -167,10 +167,12 @@ async function checkAuth() {
             window.location.href = 'login.html';
         }
     } catch (error) {
-        // Si no hay Supabase configurado, permitir acceso sin auth
+        // Si no hay Supabase, acceso sin auth
         console.warn('Auth not available:', error);
     }
 }
+
+let navListenersAdded = false;
 
 // Update navigation with auth state
 async function updateNavAuthState() {
@@ -194,28 +196,32 @@ async function updateNavAuthState() {
             if (nicknameEl) nicknameEl.textContent = nickname || user.email.split('@')[0];
             if (emailEl) emailEl.textContent = user.email;
 
-            // Toggle dropdown
-            if (avatarBtn) {
-                avatarBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    userMenu?.classList.toggle('active');
-                });
-            }
-
-            // Close dropdown when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!userMenu?.contains(e.target)) {
-                    userMenu?.classList.remove('active');
+            // Only add event listeners once
+            if (!navListenersAdded) {
+                // Toggle dropdown
+                if (avatarBtn) {
+                    avatarBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        userMenu?.classList.toggle('active');
+                    });
                 }
-            });
 
-            // Logout
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', async (e) => {
-                    e.preventDefault();
-                    await signOut();
-                    window.location.href = 'index.html';
+                // Close dropdown when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!userMenu?.contains(e.target)) {
+                        userMenu?.classList.remove('active');
+                    }
                 });
+
+                // Logout
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        await signOut();
+                        window.location.href = 'index.html';
+                    });
+                }
+                navListenersAdded = true;
             }
         } else {
             // Hide user menu, show login link

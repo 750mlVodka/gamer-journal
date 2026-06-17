@@ -30,7 +30,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  await updateNavAuthState();
 
   // Load profile (own or other user's)
   const targetUserId = profileUserId || currentUser?.id;
