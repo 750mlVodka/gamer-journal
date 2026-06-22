@@ -6,7 +6,6 @@ import { supabase } from './supabase.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     setupEventListeners();
-    updateFooter();
 
     // Auth check no block app
     try {
@@ -32,16 +31,6 @@ function setupEventListeners() {
 
     if (closeBtn) {
         closeBtn.addEventListener('click', closeModal);
-    }
-
-    if (modal) {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-        });
     }
 
     const menuBtn = document.getElementById('menuBtn');
@@ -151,13 +140,7 @@ async function toggleWishlist(game, button) {
 }
 
 
-// Update footer year
-function updateFooter() {
-    const yearSpan = document.getElementById('year');
-    if (yearSpan) {
-        yearSpan.textContent = new Date().getFullYear();
-    }
-}
+// Footer year is now statically set in HTML
 
 // Check authentication
 async function checkAuth() {
@@ -198,20 +181,7 @@ async function updateNavAuthState() {
 
             // Only add event listeners once
             if (!navListenersAdded) {
-                // Toggle dropdown
-                if (avatarBtn) {
-                    avatarBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        userMenu?.classList.toggle('active');
-                    });
-                }
-
-                // Close dropdown when clicking outside
-                document.addEventListener('click', (e) => {
-                    if (!userMenu?.contains(e.target)) {
-                        userMenu?.classList.remove('active');
-                    }
-                });
+                // No JS needed for dropdown toggle, <details> handles it natively
 
                 // Logout
                 if (logoutBtn) {

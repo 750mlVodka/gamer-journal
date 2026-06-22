@@ -31,8 +31,7 @@ export function createGameCard(game, inWishlist = false) {
 export function openModal() {
     const modal = document.getElementById('modal');
     if (modal) {
-        modal.setAttribute('aria-hidden', 'false');
-        modal.querySelector('.modal-content')?.focus();
+        modal.showModal();
         document.body.style.overflow = 'hidden';
     }
 }
@@ -41,7 +40,7 @@ export function openModal() {
 export function closeModal() {
     const modal = document.getElementById('modal');
     if (modal) {
-        modal.setAttribute('aria-hidden', 'true');
+        modal.close();
         document.body.style.overflow = '';
     }
 }
