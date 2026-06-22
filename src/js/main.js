@@ -1,6 +1,5 @@
 import { createGameCard, openModal, closeModal, loadGameDetails } from './ui.js';
 import { addToWishlist, removeFromWishlist, isInWishlist, getWishlistIds } from './wishlist.js';
-import { getCurrentUser, signOut, onAuthStateChange } from './auth.js';
 import { searchGames, getGameDetails, getTrending } from './api.js';
 import { supabase } from './supabase.js';
 
@@ -140,12 +139,18 @@ async function toggleWishlist(game, button) {
 }
 
 
-// Footer year is now statically set in HTML
+// Update footer year
+function updateFooter() {
+    const yearSpan = document.getElementById('year');
+    if (yearSpan) {
+        yearSpan.textContent = new Date().getFullYear();
+    }
+}
 
 // Check authentication
 async function checkAuth() {
     try {
-        const { data: { user } } = await getCurrentUser();
+        const { data: { user } } = await supabase.auth.getUser();
         if (!user && window.location.pathname.includes('wishlist.html')) {
             window.location.href = 'login.html';
         }
@@ -160,7 +165,7 @@ let navListenersAdded = false;
 // Update navigation with auth state
 async function updateNavAuthState() {
     try {
-        const { data: { user } } = await getCurrentUser();
+        const { data: { user } } = await supabase.auth.getUser();
         const userMenu = document.getElementById('userMenu');
         const loginLink = document.getElementById('loginLink');
         const logoutBtn = document.getElementById('logoutBtn');
@@ -187,7 +192,7 @@ async function updateNavAuthState() {
                 if (logoutBtn) {
                     logoutBtn.addEventListener('click', async (e) => {
                         e.preventDefault();
-                        await signOut();
+                        await supabase.auth.signOut();
                         window.location.href = 'index.html';
                     });
                 }

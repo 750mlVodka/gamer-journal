@@ -1,16 +1,12 @@
-import { signIn, signUp } from "./auth.js";
+import { supabase } from "./supabase.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const loginForm = document.getElementById("loginForm");
   const registerForm = document.getElementById("registerForm");
   const authMessage = document.getElementById("authMessage");
-  const yearSpan = document.getElementById("year");
   const tabs = document.querySelectorAll(".auth-tab");
   const forms = document.querySelectorAll(".auth-form");
 
-  if (yearSpan) {
-    yearSpan.textContent = new Date().getFullYear();
-  }
 
   // Tab switching
   tabs.forEach((tab) => {
@@ -46,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
       submitBtn.disabled = true;
       submitBtn.textContent = "Signing in...";
 
-      const { data, error } = await signIn(email, password);
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
       if (error) {
         showMessage(error.message, "error");
@@ -78,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
       submitBtn.disabled = true;
       submitBtn.textContent = "Creating account...";
 
-      const { data, error } = await signUp(email, password);
+      const { data, error } = await supabase.auth.signUp({ email, password });
 
       if (error) {
         showMessage(error.message, "error");
