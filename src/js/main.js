@@ -1,4 +1,4 @@
-import { createGameCard, openModal, closeModal, loadGameDetails } from './ui.js';
+import { createGameCard, openModal, closeModal, loadGameDetails, getHeartIcon } from './ui.js';
 import { addToWishlist, removeFromWishlist, isInWishlist, getWishlistIds } from './wishlist.js';
 import { searchGames, getGameDetails, getTrending } from './api.js';
 import { supabase } from './supabase.js';
@@ -41,12 +41,6 @@ function setupEventListeners() {
             menuBtn.setAttribute('aria-expanded', isOpen);
         });
 
-        window.addEventListener('resize', () => {
-            if (window.innerWidth >= 768) {
-                nav.classList.remove('open');
-                menuBtn.setAttribute('aria-expanded', false);
-            }
-        });
     }
 }
 
@@ -127,12 +121,12 @@ async function toggleWishlist(game, button) {
 
     if (inWishlist) {
         await removeFromWishlist(game.id);
-        button.innerHTML = '<i class="fa-regular fa-heart"></i>';
+        button.innerHTML = getHeartIcon(false);
         button.classList.remove('btn--primary');
         button.classList.add('btn--ghost');
     } else {
         await addToWishlist(game);
-        button.innerHTML = '<i class="fa-solid fa-heart"></i>';
+        button.innerHTML = getHeartIcon(true);
         button.classList.remove('btn--ghost');
         button.classList.add('btn--primary');
     }
