@@ -19,8 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function updateToggleIcon(btn, theme) {
     if (theme === 'dark') {
-        btn.innerHTML = '<i class="fa-solid fa-toggle-on" title="Dark Theme"></i>';
+        btn.innerHTML = '🌙';
     } else {
-        btn.innerHTML = '<i class="fa-solid fa-toggle-off" title="Light Theme"></i>';
+        btn.innerHTML = '☀️';
     }
 }

@@ -1,12 +1,10 @@
-import { createGameCard, openModal, closeModal, loadGameDetails } from './ui.js';
+import { createGameCard, openModal, closeModal, loadGameDetails, getHeartIcon } from './ui.js';
 import { addToWishlist, removeFromWishlist, isInWishlist, getWishlistIds } from './wishlist.js';
-import { getCurrentUser, signOut, onAuthStateChange } from './auth.js';
 import { searchGames, getGameDetails, getTrending } from './api.js';
 import { supabase } from './supabase.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     setupEventListeners();
-    updateFooter();
 
     // Auth check no block app
     try {
@@ -34,16 +32,6 @@ function setupEventListeners() {
         closeBtn.addEventListener('click', closeModal);
     }
 
-    if (modal) {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-        });
-    }
-
     const menuBtn = document.getElementById('menuBtn');
     const nav = document.getElementById('primaryNav');
 
@@ -53,12 +41,6 @@ function setupEventListeners() {
             menuBtn.setAttribute('aria-expanded', isOpen);
         });
 
-        window.addEventListener('resize', () => {
-            if (window.innerWidth >= 768) {
-                nav.classList.remove('open');
-                menuBtn.setAttribute('aria-expanded', false);
-            }
-        });
     }
 }
 
@@ -139,12 +121,12 @@ async function toggleWishlist(game, button) {
 
     if (inWishlist) {
         await removeFromWishlist(game.id);
-        button.innerHTML = '<i class="fa-regular fa-heart"></i>';
+        button.innerHTML = getHeartIcon(false);
         button.classList.remove('btn--primary');
         button.classList.add('btn--ghost');
     } else {
         await addToWishlist(game);
-        button.innerHTML = '<i class="fa-solid fa-heart"></i>';
+        button.innerHTML = getHeartIcon(true);
         button.classList.remove('btn--ghost');
         button.classList.add('btn--primary');
     }
@@ -162,7 +144,7 @@ function updateFooter() {
 // Check authentication
 async function checkAuth() {
     try {
-        const { data: { user } } = await getCurrentUser();
+        const { data: { user } } = await supabase.auth.getUser();
         if (!user && window.location.pathname.includes('wishlist.html')) {
             window.location.href = 'login.html';
         }
@@ -177,7 +159,7 @@ let navListenersAdded = false;
 // Update navigation with auth state
 async function updateNavAuthState() {
     try {
-        const { data: { user } } = await getCurrentUser();
+        const { data: { user } } = await supabase.auth.getUser();
         const userMenu = document.getElementById('userMenu');
         const loginLink = document.getElementById('loginLink');
         const logoutBtn = document.getElementById('logoutBtn');
@@ -198,26 +180,13 @@ async function updateNavAuthState() {
 
             // Only add event listeners once
             if (!navListenersAdded) {
-                // Toggle dropdown
-                if (avatarBtn) {
-                    avatarBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        userMenu?.classList.toggle('active');
-                    });
-                }
-
-                // Close dropdown when clicking outside
-                document.addEventListener('click', (e) => {
-                    if (!userMenu?.contains(e.target)) {
-                        userMenu?.classList.remove('active');
-                    }
-                });
+                // No JS needed for dropdown toggle, <details> handles it natively
 
                 // Logout
                 if (logoutBtn) {
                     logoutBtn.addEventListener('click', async (e) => {
                         e.preventDefault();
-                        await signOut();
+                        await supabase.auth.signOut();
                         window.location.href = 'index.html';
                     });
                 }

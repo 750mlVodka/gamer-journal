@@ -35,7 +35,3 @@ export async function getTrending(page_size = 12) {
     return await safeFetch(url);
 }
 
-export async function fetchPlaceholder() {
-    const res = await fetch('data/placeholder.json');
-    return await res.json();
-}

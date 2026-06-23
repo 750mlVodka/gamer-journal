@@ -1,6 +1,5 @@
 import { createGameCard, loadGameDetails } from './ui.js';
 import { supabase } from './supabase.js';
-import { getCurrentUser } from './auth.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const wishlistGrid = document.getElementById('wishListGrid');
@@ -14,7 +13,7 @@ export async function getWishlist() {
     try {
         if (!supabase) return [];
 
-        const { data: { user } } = await getCurrentUser();
+        const { data: { user } } = await supabase.auth.getUser();
         if (!user) return [];
 
         const { data, error } = await supabase
@@ -39,7 +38,7 @@ export async function getWishlistIds() {
     try {
         if (!supabase) return new Set();
 
-        const { data: { user } } = await getCurrentUser();
+        const { data: { user } } = await supabase.auth.getUser();
         if (!user) return new Set();
 
         const { data, error } = await supabase
@@ -67,7 +66,7 @@ export async function addToWishlist(game) {
             return;
         }
 
-        const { data: { user }, error: userError } = await getCurrentUser();
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
         if (userError || !user) {
             alert('Please login to add games to wishlist');
             window.location.href = 'login.html';
@@ -103,7 +102,7 @@ export async function removeFromWishlist(gameId) {
     try {
         if (!supabase) return;
 
-        const { data: { user } } = await getCurrentUser();
+        const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
         const { error } = await supabase
@@ -130,7 +129,7 @@ export async function isInWishlist(gameId) {
     try {
         if (!supabase) return false;
 
-        const { data: { user }, error: userError } = await getCurrentUser();
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
         if (userError || !user) return false;
 
         const { data, error: queryError } = await supabase

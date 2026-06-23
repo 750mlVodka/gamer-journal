@@ -1,18 +1,13 @@
-import { getCurrentUser, signOut } from "./auth.js";
 import { supabase } from "./supabase.js";
 import { updateNavAuthState } from "./main.js";
 import { createGameCard } from "./ui.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const yearSpan = document.getElementById("year");
-  if (yearSpan) {
-    yearSpan.textContent = new Date().getFullYear();
-  }
 
   // Get user ID from URL or current user
   const urlParams = new URLSearchParams(window.location.search);
   const profileUserId = urlParams.get("id");
-  const { data: { user: currentUser } } = await getCurrentUser();
+  const { data: { user: currentUser } } = await supabase.auth.getUser();
   
   const isOwnProfile = !profileUserId || profileUserId === currentUser?.id;
 
@@ -25,7 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) {
     logoutBtn.addEventListener("click", async () => {
-      await signOut();
+      await supabase.auth.signOut();
       window.location.href = "index.html";
     });
   }
@@ -34,6 +29,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Load profile (own or other user's)
   const targetUserId = profileUserId || currentUser?.id;
   await loadProfile(targetUserId, isOwnProfile);
+
+  // Share button
+  const shareBtn = document.getElementById("shareProfileBtn");
+  if (shareBtn) {
+    shareBtn.addEventListener("click", async () => {
+      const url = `${window.location.origin}${window.location.pathname}?id=${targetUserId}`;
+      try {
+        if (navigator.share) {
+          await navigator.share({ title: 'Gamer Journal', url });
+        } else {
+          await navigator.clipboard.writeText(url);
+          alert("Profile link copied to clipboard!");
+        }
+      } catch (e) {
+        console.error("Share failed", e);
+      }
+    });
+  }
 
   // Edit button
   const editBtn = document.getElementById("editProfileBtn");
@@ -80,7 +93,7 @@ async function loadProfile(userId, isOwnProfile) {
     }
 
     // Load user email
-    const { data: { user } } = await getCurrentUser();
+    const { data: { user } } = await supabase.auth.getUser();
     const userEmail = user?.email || "";
 
     // Display profile

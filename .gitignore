@@ -25,3 +25,4 @@ dist-ssr
 *.sw?
 
 SUPABASE_SCHEMA.sql
+.agents/
