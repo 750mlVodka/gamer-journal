@@ -79,16 +79,17 @@
         <div class="public-profile-container">
           <div class="profile-glass-card">
             <div class="profile-header-top">
-              <div class="avatar-wrapper" id="profileAvatar">👤</div>
-              <div style="display: flex; gap: 8px;">
+              <div class="avatar-and-names">
+                <div class="avatar-wrapper" id="profileAvatar">👤</div>
+                <div class="user-names">
+                  <h1 id="profileNickname">Nickname</h1>
+                  <p class="username" id="profileUsername">@username</p>
+                </div>
+              </div>
+              <div class="header-actions" style="display: flex; gap: 8px; margin-bottom: 20px;">
                 <button id="shareBtn" class="btn btn--ghost">🔗 Share</button>
                 <button id="editProfileBtn" class="btn btn--ghost" style="display: none;">✏️ Edit</button>
               </div>
-            </div>
-            
-            <div class="user-names">
-              <h1 id="profileNickname">Nickname</h1>
-              <p class="username" id="profileUsername">@username</p>
             </div>
             
             <p class="bio" id="profileBio">This is a bio...</p>
