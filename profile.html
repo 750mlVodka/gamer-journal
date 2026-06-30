@@ -3,23 +3,30 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Profile - Gamer Journal</title>
-    <link rel="stylesheet" href="src/css/normalize.css" />
-    <link rel="stylesheet" href="src/css/main.css" />
-    <link rel="stylesheet" href="src/css/theme.css" />
+    <title>Gamer Profile</title>
+    <link rel="stylesheet" href="/src/css/normalize.css" />
+    <link rel="stylesheet" href="/src/css/main.css" />
+    <link rel="stylesheet" href="/src/css/theme.css" />
+    <link rel="stylesheet" href="/src/css/public-profile.css" />
     <link rel="shortcut icon" href="/favicon.png" type="image/x-icon" />
-    <script type="module" src="src/js/theme.js"></script>
-    <script type="module" src="src/js/profile.js"></script>
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Gamer Profile" id="ogTitle" />
+    <meta property="og:description" content="Check out my gaming wishlist on Gamer Journal!" id="ogDesc" />
+    <meta property="og:image" content="/favicon.png" id="ogImage" />
+
+    <script type="module" src="/src/js/theme.js"></script>
+    <script type="module" src="/src/js/profile.js"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Inter:wght@400;600;800&display=swap"
         rel="stylesheet">
   </head>
   <body>
     <header class="site-header">
       <div class="brand">
-            <a href="index.html">
+            <a href="/">
                 <img src="/rich.svg" alt="Gamer Journal logo" class="logo" />
                 <span class="site-title">Gamer Journal</span>
             </a>
@@ -30,9 +37,9 @@
         </button>
         <button id="menuBtn" aria-expanded="false" aria-controls="primaryNav">☰</button>
         <ul id="primaryNav" class="nav-list">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="trending.html">Trending</a></li>
-          <li><a href="wishlist.html">Wishlist</a></li>
+          <li><a href="/index.html">Home</a></li>
+          <li><a href="/trending.html">Trending</a></li>
+          <li><a href="/wishlist.html">Wishlist</a></li>
         </ul>
         <details id="userMenu" class="user-menu" style="display: none;">
           <summary id="avatarBtn" class="avatar-btn" aria-label="User menu">
@@ -43,80 +50,107 @@
               <span id="userNickname" class="user-nickname"></span>
               <span id="userEmail" class="user-email"></span>
             </div>
-            <a href="profile.html" class="dropdown-item">Profile</a>
+            <a href="/profile.html" class="dropdown-item">Profile</a>
             <button id="logoutBtn" class="dropdown-item">Logout</button>
           </div>
         </details>
-        <a href="login.html" id="loginLink" class="auth-link" style="display: none;">Login</a>
+        <a href="/login.html" id="loginLink" class="auth-link" style="display: none;">Login</a>
       </nav>
     </header>
 
-    <main class="container">
-      <section class="profile-section">
-        <div id="profileView" class="profile-view">
-          <div class="profile-header">
-            <div class="profile-avatar">
-              <span class="avatar-large" id="profileAvatar">👤</span>
+    <main>
+      <!-- Loader State -->
+      <div id="loadingState" class="loader">
+        <div class="spinner"></div>
+        <p>Loading gamer profile...</p>
+      </div>
+
+      <!-- Error State -->
+      <div id="errorState" class="error-state" style="display: none;">
+        <h1>🕵️‍♂️ Profile Not Found</h1>
+        <p>This profile might be private or doesn't exist.</p>
+        <a href="/" class="btn btn--primary">Go Home</a>
+      </div>
+
+      <!-- Profile Content -->
+      <div id="profileContent" style="display: none;">
+        <div class="banner"></div>
+        
+        <div class="public-profile-container">
+          <div class="profile-glass-card">
+            <div class="profile-header-top">
+              <div class="avatar-wrapper" id="profileAvatar">👤</div>
+              <div style="display: flex; gap: 8px;">
+                <button id="shareBtn" class="btn btn--ghost">🔗 Share</button>
+                <button id="editProfileBtn" class="btn btn--ghost" style="display: none;">✏️ Edit</button>
+              </div>
             </div>
-            <div class="profile-info">
-              <h1 id="profileNickname">Loading...</h1>
-              <p id="profileUsername" class="profile-username"></p>
-              <p id="profileBio" class="profile-bio"></p>
+            
+            <div class="user-names">
+              <h1 id="profileNickname">Nickname</h1>
+              <p class="username" id="profileUsername">@username</p>
             </div>
-            <div style="display: flex; gap: 8px;">
-              <button id="shareProfileBtn" class="btn btn--ghost">Share Profile</button>
-              <button id="editProfileBtn" class="btn btn--ghost" style="display: none;">Edit Profile</button>
+            
+            <p class="bio" id="profileBio">This is a bio...</p>
+            
+            <div class="stats-grid">
+              <div class="stat-box">
+                <span class="stat-number" id="statGames">0</span>
+                <span class="stat-label">Wishlisted Games</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-number" id="statReviews">0</span>
+                <span class="stat-label">Reviews (Soon)</span>
+              </div>
             </div>
           </div>
 
-          <div class="profile-stats">
-            <div class="stat-item">
-              <span class="stat-number" id="wishlistCount">0</span>
-              <span class="stat-label">Games in Wishlist</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-number" id="memberSince">-</span>
-              <span class="stat-label">Member Since</span>
-            </div>
-          </div>
-
-          <div class="profile-wishlist">
-            <h2>Public Wishlist</h2>
-            <div id="publicWishlist" class="results"></div>
+          <h2 class="section-title">Collection</h2>
+          <div id="publicWishlist" class="results">
+            <!-- Game cards injected here -->
           </div>
         </div>
+      </div>
 
-        <div id="profileEdit" class="profile-edit" style="display: none;">
-          <h1>Edit Profile</h1>
-          <div id="profileMessage" class="auth-message"></div>
-          
-          <form id="profileForm" class="auth-form active">
-            <div class="form-group">
-              <label for="nickname">Nickname</label>
-              <input type="text" id="nickname" placeholder="Your nickname" maxlength="30" />
-            </div>
-            <div class="form-group">
-              <label for="username">Username (unique)</label>
-              <input type="text" id="username" placeholder="username" maxlength="20" pattern="[a-z0-9_]+" />
-              <small>Lowercase letters, numbers, and underscores only</small>
-            </div>
-            <div class="form-group">
-              <label for="bio">Bio</label>
-              <textarea id="bio" placeholder="Tell us about yourself..." maxlength="200" rows="3"></textarea>
-            </div>
-            <div class="form-group">
-              <label>
-                <input type="checkbox" id="isPublic" checked />
-                Make profile public
-              </label>
-            </div>
-            <div class="form-actions">
-              <button type="submit" class="btn btn--primary">Save Changes</button>
-              <button type="button" id="cancelEditBtn" class="btn btn--ghost">Cancel</button>
-            </div>
-          </form>
-        </div>
-      </section>
+      <!-- Edit State -->
+      <div id="profileEdit" class="profile-edit public-profile-container" style="display: none; padding-top: 40px;">
+        <h1>Edit Profile</h1>
+        <div id="profileMessage" class="auth-message"></div>
+        
+        <form id="profileForm" class="auth-form active">
+          <div class="form-group">
+            <label for="nickname">Nickname</label>
+            <input type="text" id="nickname" placeholder="Your nickname" maxlength="30" />
+          </div>
+          <div class="form-group">
+            <label for="username">Username (unique)</label>
+            <input type="text" id="username" placeholder="username" maxlength="20" pattern="[a-z0-9_]+" />
+            <small>Lowercase letters, numbers, and underscores only</small>
+          </div>
+          <div class="form-group">
+            <label for="avatarUrl">Avatar Image URL</label>
+            <input type="url" id="avatarUrl" placeholder="https://example.com/avatar.jpg" />
+          </div>
+          <div class="form-group">
+            <label for="bannerUrl">Banner Image URL</label>
+            <input type="url" id="bannerUrl" placeholder="https://example.com/banner.jpg" />
+          </div>
+          <div class="form-group">
+            <label for="bio">Bio</label>
+            <textarea id="bio" placeholder="Tell us about yourself..." maxlength="200" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="isPublic" checked />
+              Make profile public
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn--primary">Save Changes</button>
+            <button type="button" id="cancelEditBtn" class="btn btn--ghost">Cancel</button>
+          </div>
+        </form>
+      </div>
     </main>
 
     <footer class="site-footer">
