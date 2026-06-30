@@ -83,10 +83,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('profileBio').textContent = profile.bio || "This gamer hasn't added a bio yet.";
     
     if (profile.avatar_url) {
-      document.getElementById('profileAvatar').innerHTML = `<img src="${profile.avatar_url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+      const img = document.createElement('img');
+      img.src = profile.avatar_url;
+      img.alt = profile.nickname || 'Avatar';
+      Object.assign(img.style, { width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' });
+      const avatar = document.getElementById('profileAvatar');
+      avatar.textContent = '';
+      avatar.appendChild(img);
     }
     if (profile.banner_url) {
-      document.querySelector('.banner').style.background = `url("${profile.banner_url}") center/cover no-repeat`;
+      document.querySelector('.banner').style.background = `url("${CSS.escape(profile.banner_url)}") center/cover no-repeat`;
     }
     
     // Update Meta Tags for sharing
