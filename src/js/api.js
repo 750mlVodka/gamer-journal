@@ -35,3 +35,35 @@ export async function getTrending(page_size = 12) {
     return await safeFetch(url);
 }
 
+// Supabase Public API Methods
+import { supabase } from './supabase.js';
+
+export async function getPublicProfileByUsername(username) {
+    if (!supabase) throw new Error("Supabase client not initialized.");
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('username', username)
+        .eq('is_public', true)
+        .single();
+    
+    if (error) {
+        console.error("Error fetching public profile:", error);
+        return null;
+    }
+    return data;
+}
+
+export async function getPublicWishlist(userId) {
+    if (!supabase) return [];
+    const { data, error } = await supabase
+        .from('wishlists')
+        .select('*')
+        .eq('user_id', userId);
+        
+    if (error) {
+        console.error("Error fetching public wishlist:", error);
+        return [];
+    }
+    return data;
+}

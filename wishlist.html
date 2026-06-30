@@ -11,17 +11,24 @@
         content="Wishlist of your favorites video games. To add or remove games from your wishlist, click the heart icon on the game card.">
     <meta name="author" content="Yamsir Hernandez">
 
+    <!-- Open Graph -->
+    <meta property="og:title" content="Gamer Journal — Your Wishlist">
+    <meta property="og:description" content="Your curated list of favorite video games on Gamer Journal.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="/favicon.png">
+
+    <link rel="canonical" href="/wishlist.html">
     <link rel="stylesheet" href="src/css/normalize.css" />
     <link rel="stylesheet" href="src/css/main.css" />
     <link rel="stylesheet" href="src/css/theme.css" />
-    <link rel="shortcut icon" href="/favicon.png" type="image/x-icon">
+    <link rel="icon" href="/favicon.png" type="image/png">
 
     <script type="module" src="src/js/theme.js"></script>
     <script type="module" src="src/js/main.js"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600;700&display=swap"
         rel="stylesheet">
 </head>
 
@@ -34,7 +41,7 @@
             </a>
         </div>
         <nav>
-            <button id="themeToggleBtn" aria-label="Cambiar tema">
+            <button id="themeToggleBtn" aria-label="Toggle theme">
                 🌗
             </button>
             <button id="menuBtn" aria-expanded="false" aria-controls="primaryNav">☰</button>
@@ -69,18 +76,18 @@
         <section id="wishListGrid" class="results" aria-live="polite">
             <!-- favorites -->
         </section>
+
+        <!-- Modal for game details -->
+        <dialog id="modal" class="modal">
+            <div class="modal-content">
+                <button class="modal-close" aria-label="Close details">&times;</button>
+                <div id="modalBody"></div>
+            </div>
+        </dialog>
     </main>
 
-    <!-- Modal for game details (index.html) -->
-    <dialog id="modal" class="modal">
-        <div class="modal-content">
-            <button class="modal-close" aria-label="Close details">&times;</button>
-            <div id="modalBody"></div>
-        </div>
-    </dialog>
-
     <footer class="site-footer">
-        <p>&copy; 2026 Gamer Journal — MOR, México</p>
+        <p>&copy; 2026 Gamer Journal</p>
     </footer>
 
 </body>

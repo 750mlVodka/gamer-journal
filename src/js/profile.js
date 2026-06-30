@@ -1,258 +1,222 @@
 import { supabase } from "./supabase.js";
-import { updateNavAuthState } from "./main.js";
-import { createGameCard } from "./ui.js";
+import { getPublicProfileByUsername, getPublicWishlist } from './api.js';
+import { createGameCard } from './ui.js';
+import { updateNavAuthState } from './main.js';
 
-document.addEventListener("DOMContentLoaded", async () => {
-
-  // Get user ID from URL or current user
-  const urlParams = new URLSearchParams(window.location.search);
-  const profileUserId = urlParams.get("id");
-  const { data: { user: currentUser } } = await supabase.auth.getUser();
-  
-  const isOwnProfile = !profileUserId || profileUserId === currentUser?.id;
-
-  if (!currentUser && !profileUserId) {
-    window.location.href = "login.html";
-    return;
-  }
-
-  // Setup nav
+document.addEventListener('DOMContentLoaded', async () => {
+  // Init nav (main.js handles most, but we handle logout locally too)
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) {
     logoutBtn.addEventListener("click", async () => {
       await supabase.auth.signOut();
-      window.location.href = "index.html";
+      window.location.href = "/index.html";
     });
   }
 
+  const loadingState = document.getElementById('loadingState');
+  const errorState = document.getElementById('errorState');
+  const profileContent = document.getElementById('profileContent');
 
-  // Load profile (own or other user's)
-  const targetUserId = profileUserId || currentUser?.id;
-  await loadProfile(targetUserId, isOwnProfile);
+  // Check URL for username: /profile/yamsir or /profile.html?u=yamsir
+  let username = window.location.pathname.split('/').pop();
+  if (username === 'profile.html' || username === 'profile') username = null;
+  if (!username) username = new URLSearchParams(window.location.search).get('u');
 
-  // Share button
-  const shareBtn = document.getElementById("shareProfileBtn");
-  if (shareBtn) {
-    shareBtn.addEventListener("click", async () => {
-      const url = `${window.location.origin}${window.location.pathname}?id=${targetUserId}`;
-      try {
-        if (navigator.share) {
-          await navigator.share({ title: 'Gamer Journal', url });
-        } else {
-          await navigator.clipboard.writeText(url);
-          alert("Profile link copied to clipboard!");
-        }
-      } catch (e) {
-        console.error("Share failed", e);
+  const { data: { user } } = await supabase.auth.getUser();
+
+  let profile = null;
+  let isOwner = false;
+
+  try {
+    if (username) {
+      // Viewing someone's profile (or own via /profile/my_user)
+      profile = await getPublicProfileByUsername(username);
+      // Wait, what if it's our own profile but it's private? getPublicProfileByUsername filters by is_public=true.
+      // If we are the owner, we should be able to see it even if private.
+      // Let's do a direct fetch if getPublicProfileByUsername fails but we are logged in.
+      if (!profile && user) {
+        const { data } = await supabase.from('profiles').select('*').eq('username', username).single();
+        if (data && data.user_id === user.id) profile = data;
       }
-    });
-  }
+    } else {
+      // Accessed /profile.html directly
+      if (!user) {
+        window.location.href = '/login.html';
+        return;
+      }
+      // Fetch our own profile
+      const { data } = await supabase.from('profiles').select('*').eq('user_id', user.id).single();
+      profile = data;
+      
+      // If we have a username, ideally we want the URL to look pretty, but avoiding redirect.
+      // We can use history.replaceState to change URL without reloading!
+      if (profile && profile.username) {
+        window.history.replaceState({}, '', `/profile/${profile.username}`);
+      }
+    }
 
-  // Edit button
-  const editBtn = document.getElementById("editProfileBtn");
-  const cancelBtn = document.getElementById("cancelEditBtn");
-  if (editBtn && isOwnProfile) {
-    editBtn.style.display = "block";
-    editBtn.addEventListener("click", () => {
-      document.getElementById("profileView").style.display = "none";
-      document.getElementById("profileEdit").style.display = "block";
-      loadProfileForEdit(targetUserId);
-    });
-  }
-  if (cancelBtn) {
-    cancelBtn.addEventListener("click", () => {
-      document.getElementById("profileView").style.display = "block";
-      document.getElementById("profileEdit").style.display = "none";
-    });
-  }
+    if (!profile) {
+      // No profile found
+      if (user && !username) {
+        // We are logged in but have NO profile/username setup yet. Show edit form immediately.
+        loadingState.style.display = 'none';
+        document.getElementById('profileEdit').style.display = 'block';
+        const cancelBtn = document.getElementById('cancelEditBtn');
+        if (cancelBtn) cancelBtn.style.display = 'none'; // Force setup
+        setupEditForm(null, user);
+        return;
+      } else {
+        // Someone else's profile not found or private
+        loadingState.style.display = 'none';
+        errorState.style.display = 'block';
+        return;
+      }
+    }
 
-  // Save profile
-  const profileForm = document.getElementById("profileForm");
-  if (profileForm) {
-    profileForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      await saveProfile(targetUserId);
-    });
+    // We have a profile to display!
+    isOwner = user && user.id === profile.user_id;
+
+    // Populate profile UI
+    document.title = `${profile.nickname} (@${profile.username}) | Gamer Journal`;
+    document.getElementById('profileNickname').textContent = profile.nickname || 'Gamer';
+    document.getElementById('profileUsername').textContent = `@${profile.username}`;
+    document.getElementById('profileBio').textContent = profile.bio || "This gamer hasn't added a bio yet.";
+    
+    if (profile.avatar_url) {
+      const img = document.createElement('img');
+      img.src = profile.avatar_url;
+      img.alt = profile.nickname || 'Avatar';
+      Object.assign(img.style, { width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' });
+      const avatar = document.getElementById('profileAvatar');
+      avatar.textContent = '';
+      avatar.appendChild(img);
+    }
+    if (profile.banner_url) {
+      document.querySelector('.banner').style.background = `url("${CSS.escape(profile.banner_url)}") center/cover no-repeat`;
+    }
+    
+    // Update Meta Tags for sharing
+    document.getElementById('ogTitle').content = `${profile.nickname}'s Gamer Profile`;
+    document.getElementById('ogDesc').content = profile.bio || "Check out my gaming wishlist on Gamer Journal!";
+
+    // Fetch Wishlist
+    // If it's our own profile, we can fetch all. If public, getPublicWishlist.
+    let wishlist = [];
+    if (isOwner) {
+       const { data } = await supabase.from('wishlists').select('*').eq('user_id', profile.user_id);
+       wishlist = data || [];
+    } else {
+       wishlist = await getPublicWishlist(profile.user_id);
+    }
+    
+    document.getElementById('statGames').textContent = wishlist.length;
+
+    const wishlistContainer = document.getElementById('publicWishlist');
+    if (wishlist && wishlist.length > 0) {
+      wishlistContainer.innerHTML = wishlist
+        .map(item => createGameCard(item.game_data, false))
+        .join("");
+
+      // Add click handlers for games
+      wishlist.forEach((item) => {
+        const viewBtn = wishlistContainer.querySelector(`[data-game-id="${item.game_data.id}"]`);
+        if (viewBtn) {
+          viewBtn.addEventListener("click", async () => {
+            const m = await import("./main.js");
+            m.loadGameDetails(item.game_data.id);
+          });
+        }
+      });
+    } else {
+      wishlistContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">No games in wishlist yet.</p>';
+    }
+
+    loadingState.style.display = 'none';
+    profileContent.style.display = 'block';
+
+    // Setup Share Button
+    const shareBtn = document.getElementById('shareBtn');
+    if (shareBtn) {
+      shareBtn.addEventListener('click', async () => {
+        const url = window.location.href;
+        try {
+          if (navigator.share) {
+            await navigator.share({ title: document.title, url: url });
+          } else {
+            await navigator.clipboard.writeText(url);
+            alert('Profile link copied to clipboard!');
+          }
+        } catch (err) {
+          console.error("Share failed", err);
+        }
+      });
+    }
+
+    // Setup Edit Logic if Owner
+    if (isOwner) {
+      const editBtn = document.getElementById('editProfileBtn');
+      editBtn.style.display = 'block';
+      editBtn.addEventListener('click', () => {
+        profileContent.style.display = 'none';
+        document.getElementById('profileEdit').style.display = 'block';
+      });
+      setupEditForm(profile, user);
+    }
+
+  } catch (err) {
+    console.error("Error loading profile:", err);
+    loadingState.style.display = 'none';
+    errorState.style.display = 'block';
   }
 });
 
-async function loadProfile(userId, isOwnProfile) {
-  try {
-    if (!supabase) return;
+function setupEditForm(profile, user) {
+  const cancelBtn = document.getElementById('cancelEditBtn');
+  const profileForm = document.getElementById('profileForm');
 
-    // Load profile
-    const { data: profile, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("user_id", userId)
-      .single();
-
-    if (error && error.code !== "PGRST116") {
-      console.error("Error loading profile:", error);
-      return;
-    }
-
-    // Load user email
-    const { data: { user } } = await supabase.auth.getUser();
-    const userEmail = user?.email || "";
-
-    // Display profile
-    const nickname = profile?.nickname || userEmail.split("@")[0];
-    const username = profile?.username || "";
-    const bio = profile?.bio || "";
-    
-    document.getElementById("profileNickname").textContent = nickname;
-    document.getElementById("profileUsername").textContent = username ? `@${username}` : "";
-    document.getElementById("profileBio").textContent = bio || "No bio yet.";
-
-    // Load stats
-    const wishlistCount = await getWishlistCount(userId);
-    document.getElementById("wishlistCount").textContent = wishlistCount;
-
-    if (profile?.created_at) {
-      const date = new Date(profile.created_at);
-      document.getElementById("memberSince").textContent = date.getFullYear();
-    }
-
-    // Load public wishlist
-    if (profile?.is_public !== false || isOwnProfile) {
-      await loadPublicWishlist(userId);
-    }
-  } catch (error) {
-    console.error("Error:", error);
+  if (profile) {
+    document.getElementById("nickname").value = profile.nickname || "";
+    document.getElementById("username").value = profile.username || "";
+    document.getElementById("avatarUrl").value = profile.avatar_url || "";
+    document.getElementById("bannerUrl").value = profile.banner_url || "";
+    document.getElementById("bio").value = profile.bio || "";
+    document.getElementById("isPublic").checked = profile.is_public !== false;
   }
-}
 
-async function loadProfileForEdit(userId) {
-  try {
-    if (!supabase) return;
-
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("user_id", userId)
-      .single();
-
-    if (profile) {
-      document.getElementById("nickname").value = profile.nickname || "";
-      document.getElementById("username").value = profile.username || "";
-      document.getElementById("bio").value = profile.bio || "";
-      document.getElementById("isPublic").checked = profile.is_public !== false;
-    }
-  } catch (error) {
-    console.error("Error loading profile for edit:", error);
-  }
-}
-
-async function getWishlistCount(userId) {
-  try {
-    if (!supabase) return 0;
-    const { count } = await supabase
-      .from("wishlists")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", userId);
-    return count || 0;
-  } catch (error) {
-    return 0;
-  }
-}
-
-async function loadPublicWishlist(userId) {
-  try {
-    if (!supabase) return;
-
-    const { data: wishlist } = await supabase
-      .from("wishlists")
-      .select("game_data")
-      .eq("user_id", userId)
-      .limit(12);
-
-    const container = document.getElementById("publicWishlist");
-    if (!container) return;
-
-    if (!wishlist || wishlist.length === 0) {
-      container.innerHTML = "<p>No games in wishlist yet.</p>";
-      return;
-    }
-
-    container.innerHTML = wishlist
-      .map((item) => createGameCard(item.game_data, false))
-      .join("");
-
-    // Add click handlers
-    wishlist.forEach((item) => {
-      const viewBtn = container.querySelector(`[data-game-id="${item.game_data.id}"]`);
-      if (viewBtn) {
-        viewBtn.addEventListener("click", async () => {
-          const m = await import("./main.js");
-          m.loadGameDetails(item.game_data.id);
-        });
-      }
+  if (cancelBtn && profile) {
+    cancelBtn.addEventListener('click', () => {
+      document.getElementById('profileContent').style.display = 'block';
+      document.getElementById('profileEdit').style.display = 'none';
     });
-  } catch (error) {
-    console.error("Error loading wishlist:", error);
   }
-}
 
-async function saveProfile(userId) {
-  try {
-    if (!supabase) {
-      showMessage("Supabase not configured", "error");
-      return;
-    }
-
-    const submitBtn = document.querySelector("#profileForm button[type='submit']");
-    const originalText = submitBtn.textContent;
+  // Remove existing listeners by cloning node if necessary, but we only setup once per page load
+  profileForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitBtn = profileForm.querySelector("button[type='submit']");
     submitBtn.disabled = true;
-    submitBtn.textContent = "Saving...";
 
-    const nickname = document.getElementById("nickname").value.trim();
-    const username = document.getElementById("username").value.trim().toLowerCase();
-    const bio = document.getElementById("bio").value.trim();
-    const isPublic = document.getElementById("isPublic").checked;
+    const updates = {
+      nickname: document.getElementById("nickname").value.trim() || null,
+      username: document.getElementById("username").value.trim().toLowerCase() || null,
+      avatar_url: document.getElementById("avatarUrl").value.trim() || null,
+      banner_url: document.getElementById("bannerUrl").value.trim() || null,
+      bio: document.getElementById("bio").value.trim() || null,
+      is_public: document.getElementById("isPublic").checked,
+      updated_at: new Date().toISOString(),
+    };
 
-    const { error } = await supabase
-      .from("profiles")
-      .update({
-        nickname: nickname || null,
-        username: username || null,
-        bio: bio || null,
-        is_public: isPublic,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("user_id", userId);
-
+    const { error } = await supabase.from("profiles").update(updates).eq("user_id", user.id);
+    
     if (error) {
-      showMessage(error.message, "error");
+      alert("Error: " + error.message);
       submitBtn.disabled = false;
-      submitBtn.textContent = originalText;
     } else {
-      showMessage("Profile updated successfully!", "success");
-      submitBtn.disabled = false;
-      submitBtn.textContent = originalText;
-      
-      // Switch back to view
-      document.getElementById("profileView").style.display = "block";
-      document.getElementById("profileEdit").style.display = "none";
-      
-      // Reload profile
-      await loadProfile(userId, true);
-      setTimeout(() => updateNavAuthState(), 500);
+      if (updates.username && (!profile || updates.username !== profile.username)) {
+        window.location.href = `/profile/${updates.username}`;
+      } else {
+        window.location.reload();
+      }
     }
-  } catch (error) {
-    showMessage("Error saving profile", "error");
-  }
+  });
 }
-
-function showMessage(message, type) {
-  const msgEl = document.getElementById("profileMessage");
-  if (msgEl) {
-    msgEl.textContent = message;
-    msgEl.className = `auth-message ${type}`;
-    msgEl.style.display = "block";
-    setTimeout(() => {
-      msgEl.style.display = "none";
-    }, 5000);
-  }
-}
-

@@ -11,17 +11,24 @@
         content="Search and explore video games from RAWG database. Add video games to your favorites or wishlist.">
     <meta name="author" content="Yamsir Hernandez">
 
+    <!-- Open Graph -->
+    <meta property="og:title" content="Gamer Journal - Search & Explore Games">
+    <meta property="og:description" content="Search and explore video games from RAWG database. Add games to your wishlist.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="/favicon.png">
+
+    <link rel="canonical" href="/index.html">
     <link rel="stylesheet" href="src/css/normalize.css" />
     <link rel="stylesheet" href="src/css/main.css" />
     <link rel="stylesheet" href="src/css/theme.css" />
-    <link rel="shortcut icon" href="/favicon.png" type="image/x-icon">
+    <link rel="icon" href="/favicon.png" type="image/png">
 
     <script type="module" src="src/js/theme.js"></script>
     <script type="module" src="src/js/main.js"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600;700&display=swap"
         rel="stylesheet">
 </head>
 
@@ -34,7 +41,7 @@
             </a>
         </div>
         <nav>
-            <button id="themeToggleBtn" aria-label="Cambiar tema">
+            <button id="themeToggleBtn" aria-label="Toggle theme">
                 🌗
             </button>
             <button id="menuBtn" aria-expanded="false" aria-controls="primaryNav">☰</button>
@@ -64,9 +71,8 @@
         <section class="search-section">
             <h1>Search Games</h1>
             <form id="searchForm" aria-label="Search games">
-                <label for="q"></label>
                 <input id="q" name="q" type="search" placeholder="Search games by title..." autocomplete="off"
-                    required />
+                    aria-label="Search games by title" required />
                 <button id="searchBtn" type="submit">Search</button>
             </form>
         </section>
@@ -85,7 +91,7 @@
     </main>
 
     <footer class="site-footer">
-        <p>&copy; 2026 Gamer Journal — MOR, México</p>
+        <p>&copy; 2026 Gamer Journal</p>
     </footer>
 
 </body>

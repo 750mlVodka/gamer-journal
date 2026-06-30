@@ -6,6 +6,13 @@
     --muted: #666666;
     --text: #1C1C1E;
     --border: #D1D1D6;
+    --primary: #007AFF;
+    --secondary: #666666;
+    --primary-rgb: 0, 122, 255;
+    --secondary-rgb: 102, 102, 102;
+    --bg: #F5F5F7;
+    --surface: #FFFFFF;
+    --text-muted: #888;
 }
 
 /* Theme toggle button */

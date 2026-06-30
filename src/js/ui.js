@@ -1,5 +1,11 @@
 import { getGameDetails } from './api.js';
 
+function escapeHTML(str) {
+    const div = document.createElement('div');
+    div.textContent = str ?? '';
+    return div.innerHTML;
+}
+
 export function getHeartIcon(isFilled) {
     const fill = isFilled ? 'currentColor' : 'none';
     return `<svg width="20" height="20" viewBox="0 0 24 24" fill="${fill}" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;">
@@ -11,18 +17,25 @@ export function createGameCard(game, inWishlist = false) {
     const wishlistBtnClass = inWishlist ? 'btn btn--primary' : 'btn btn--ghost';
     const wishlistBtnText = getHeartIcon(inWishlist);
 
+    const name = escapeHTML(game.name);
+    const released = escapeHTML(game.released || 'N/A');
+    const rating = escapeHTML(String(game.rating || 'N/A'));
+    const genres = escapeHTML(game.genres?.map(g => g.name).join(', ') || 'N/A');
+    const imgSrc = encodeURI(game.background_image || 'images/placeholder.jpg');
+
     return `
         <article class="card">
             <figure>
-                <img src="${game.background_image || 'images/placeholder.jpg'}" 
-                    alt="${game.name}" 
+                <img src="${imgSrc}" 
+                    alt="${name}" 
+                    width="400" height="220"
                     loading="lazy">
             </figure>
             <div class="meta">
-                <h2>${game.name}</h2>
-                <p><strong>Released:</strong> ${game.released || 'N/A'}</p>
-                <p><strong>Rating:</strong> ${game.rating || 'N/A'} / 5</p>
-                <p><strong>Genres:</strong> ${game.genres?.map(g => g.name).join(', ') || 'N/A'}</p>
+                <h2>${name}</h2>
+                <p><strong>Released:</strong> ${released}</p>
+                <p><strong>Rating:</strong> ${rating} / 5</p>
+                <p><strong>Genres:</strong> ${genres}</p>
                 <div class="actions">
                     <button class="btn btn--ghost" data-game-id="${game.id}"> Details</button>
                     <button class="${wishlistBtnClass}" data-wishlist-id="${game.id}">${wishlistBtnText}</button>
@@ -56,14 +69,22 @@ export async function loadGameDetails(gameId) {
         const game = await getGameDetails(gameId);
 
         const modalBody = document.getElementById('modalBody');
+        const name = escapeHTML(game.name);
+        const imgSrc = encodeURI(game.background_image || '');
+        const released = escapeHTML(game.released || 'N/A');
+        const rating = escapeHTML(String(game.rating || 'N/A'));
+        const genres = escapeHTML(game.genres?.map(g => g.name).join(', ') || 'N/A');
+        const platforms = escapeHTML(game.platforms?.map(p => p.platform.name).join(', ') || 'N/A');
+        const desc = escapeHTML(game.description_raw?.substring(0, 1000) || 'No description available.');
+
         modalBody.innerHTML = `
-            <img src="${game.background_image}" alt="${game.name}">
-            <h2>${game.name}</h2>
-            <p class="released"><strong>Released:</strong> ${game.released || 'N/A'}</p>
-            <p class="rating"><strong>Rating:</strong> ${game.rating || 'N/A'} / 5</p>
-            <p class="genres"><strong>Genres:</strong> ${game.genres?.map(g => g.name).join(', ') || 'N/A'}</p>
-            <p class="platfomrs"><strong>Platforms:</strong> ${game.platforms?.map(p => p.platform.name).join(', ') || 'N/A'}</p>
-            <p class="desc">${game.description_raw?.substring(0, 1000) || 'No description available.'}...</p>
+            <img src="${imgSrc}" alt="${name}">
+            <h2>${name}</h2>
+            <p class="released"><strong>Released:</strong> ${released}</p>
+            <p class="rating"><strong>Rating:</strong> ${rating} / 5</p>
+            <p class="genres"><strong>Genres:</strong> ${genres}</p>
+            <p class="platforms"><strong>Platforms:</strong> ${platforms}</p>
+            <p class="desc">${desc}...</p>
         `;
 
         openModal();
